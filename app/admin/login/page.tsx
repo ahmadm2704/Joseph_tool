@@ -16,14 +16,16 @@ export default function AdminLogin() {
     setError('')
     setIsLoading(true)
 
-    // Demo login - for now accept admin@coursepro.com / admin123
-    if (email === 'admin@coursepro.com' && password === 'admin123') {
+    const validEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'admin@coursepro.com'
+    const validPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'admin123'
+
+    if (email === validEmail && password === validPassword) {
       // Set session in localStorage for demo purposes
       localStorage.setItem('adminSession', JSON.stringify({ email, timestamp: Date.now() }))
       console.log('[v0] Admin logged in')
       router.push('/admin/dashboard')
     } else {
-      setError('Invalid email or password. Try: admin@coursepro.com / admin123')
+      setError(`Invalid email or password. Try: ${validEmail} / ${validPassword}`)
     }
 
     setIsLoading(false)
