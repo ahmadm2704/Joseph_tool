@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, BookOpen, MapPin, Calendar, User, ChevronRight, CheckCircle2, Building, Mail, Phone, Map, FileText, Upload, Sparkles, Star } from 'lucide-react'
+import { X, BookOpen, MapPin, Calendar, User, ChevronRight, CheckCircle2, Building, Mail, Phone, Map, FileText, Upload, Sparkles, Star, Clock, AlertCircle, Layers, Wifi } from 'lucide-react'
 import { useStore, Course, City, Day } from '@/lib/store'
 
 interface RegistrationModalProps {
@@ -154,20 +154,40 @@ export default function RegistrationModal({ isOpen, onClose, courses }: Registra
                     </h3>
                     <div className="grid gap-4">
                       {courses.map((course: Course) => (
-                        <button key={course.id} onClick={() => handleCourseSelect(course.id)} className="w-full text-left glass-card-static bg-white/[0.02] border-white/5 rounded-2xl p-6 hover:bg-white/[0.04] hover:border-purple-500/30 hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-300 group flex items-center justify-between">
-                          <div>
-                            <div className="flex items-center gap-2 mb-1">
-                              <span className="font-bold text-lg text-white group-hover:text-purple-300 transition-colors">{course.name}</span>
-                              <div className="flex items-center gap-1 bg-amber-500/10 text-amber-400 px-1.5 py-0.5 rounded text-[0.6rem] font-bold uppercase tracking-wider"><Star size={10} className="fill-amber-400"/> 4.9</div>
+                        <button key={course.id} onClick={() => handleCourseSelect(course.id)} className="w-full text-left glass-card-static bg-white/[0.02] border-white/5 rounded-2xl p-5 hover:bg-white/[0.04] hover:border-purple-500/30 hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-300 group">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                                <span className="font-bold text-base text-white group-hover:text-purple-300 transition-colors">{course.name}</span>
+                                <div className="flex items-center gap-1 bg-amber-500/10 text-amber-400 px-1.5 py-0.5 rounded text-[0.6rem] font-bold uppercase tracking-wider shrink-0"><Star size={10} className="fill-amber-400"/> 4.9</div>
+                              </div>
+                              <div className="text-xs text-gray-500 mb-3 line-clamp-1">{course.description}</div>
+                              <div className="grid grid-cols-2 gap-x-4 gap-y-2 mb-3">
+                                <div className="flex items-center gap-1.5 text-xs text-gray-400">
+                                  <Clock size={12} className="text-purple-400 shrink-0" />
+                                  <span className="font-semibold text-gray-300">{course.duration}</span>
+                                </div>
+                                <div className="flex items-center gap-1.5 text-xs text-gray-400">
+                                  <AlertCircle size={12} className="text-rose-400 shrink-0" />
+                                  <span>Deadline: <span className="font-semibold text-rose-300">{course.deadline}</span></span>
+                                </div>
+                                <div className="flex items-center gap-1.5 text-xs text-gray-400">
+                                  <Wifi size={12} className="text-cyan-400 shrink-0" />
+                                  <span className="font-semibold text-gray-300">{course.delivery}</span>
+                                </div>
+                                <div className="flex items-center gap-1.5 text-xs text-gray-400">
+                                  <Calendar size={12} className="text-green-400 shrink-0" />
+                                  <span className="font-semibold text-gray-300 truncate">{course.daysSchedule}</span>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-1.5 bg-amber-500/10 border border-amber-500/20 rounded-lg px-3 py-1.5">
+                                <Layers size={11} className="text-amber-400 shrink-0" />
+                                <span className="text-xs text-amber-300 font-medium">Requirements: {course.requirements}</span>
+                              </div>
                             </div>
-                            <div className="text-sm text-gray-500 mt-1 line-clamp-1">{course.description}</div>
-                            <div className="flex gap-2 mt-4">
-                              <span className="tag-pill bg-purple-500/10 text-purple-300 border-purple-500/10">{course.cities?.length || 0} Locations</span>
-                              <span className="tag-pill bg-cyan-500/10 text-cyan-300 border-cyan-500/10">{course.days?.length || 0} Schedules</span>
+                            <div className="w-9 h-9 rounded-xl glass bg-white/5 flex items-center justify-center text-gray-500 group-hover:bg-purple-500 group-hover:text-white transition-all duration-300 group-hover:shadow-lg shadow-purple-500/30 group-hover:scale-110 shrink-0 mt-1">
+                              <ChevronRight size={16} />
                             </div>
-                          </div>
-                          <div className="w-10 h-10 rounded-xl glass bg-white/5 flex items-center justify-center text-gray-500 group-hover:bg-purple-500 group-hover:text-white transition-all duration-300 group-hover:shadow-lg shadow-purple-500/30 group-hover:scale-110">
-                            <ChevronRight size={18} />
                           </div>
                         </button>
                       ))}
@@ -221,41 +241,83 @@ export default function RegistrationModal({ isOpen, onClose, courses }: Registra
                   </motion.div>
                 )}
 
-                {step === 'documents' && (
-                  <motion.div key="documents" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
-                    <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2 tracking-tight"><FileText className="text-purple-400" size={20} /> Optional Documents</h3>
-                    <p className="text-gray-400 text-sm">Upload transcripts, CV, or prior certifications to accelerate your placement.</p>
+                {step === 'documents' && (() => {
+                  const selectedCourse = courses.find((c: Course) => c.id === formData.courseId)
+                  return (
+                    <motion.div key="documents" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-5">
+                      <div>
+                        <h3 className="text-xl font-bold text-white mb-1 flex items-center gap-2 tracking-tight"><FileText className="text-purple-400" size={20} /> Document Submission</h3>
+                        <p className="text-gray-400 text-sm">Please upload the required documents to support your application.</p>
+                      </div>
 
-                    <div 
-                      className={`glass-card-static border-dashed border-2 rounded-2xl p-10 text-center transition-all duration-300 cursor-pointer relative overflow-hidden ${formData.documentsAttached ? 'border-green-500/40 bg-green-500/5' : 'border-white/10 hover:border-purple-500/40 bg-white/[0.02] hover:bg-purple-500/5'}`}
-                      onClick={() => !formData.documentsAttached && fileInputRef.current?.click()}
-                    >
-                      <input type="file" ref={fileInputRef} onChange={handleDocumentUpload} className="hidden" multiple />
-                      {!formData.documentsAttached ? (
-                        <>
-                          <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-purple-500 to-violet-600 flex items-center justify-center mx-auto mb-5 shadow-xl shadow-purple-500/20 group-hover:scale-105 transition-transform"><Upload size={28} className="text-white" /></div>
-                          <h4 className="text-white font-bold text-lg mb-2">Upload your documents</h4>
-                          <p className="text-gray-500 text-sm mb-6">Drag and drop or click to browse</p>
-                          <button onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click() }} className="btn-secondary text-sm">Browse Files</button>
-                        </>
-                      ) : (
-                        <>
-                          <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center mx-auto mb-5 shadow-xl shadow-green-500/20"><CheckCircle2 size={32} className="text-white" /></div>
-                          <h4 className="text-green-400 font-bold text-lg mb-2">Documents Attached</h4>
-                          <p className="text-green-500/60 text-sm mb-6">Your files are ready for review.</p>
-                          <button onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click() }} className="text-sm font-bold tracking-wide text-green-400 hover:text-green-300 transition-colors uppercase">Upload different files</button>
-                        </>
+                      {/* Entry Requirements Banner */}
+                      {selectedCourse && (
+                        <div className="glass-card-static bg-amber-500/5 border border-amber-500/25 rounded-2xl p-4">
+                          <div className="flex items-start gap-3">
+                            <div className="w-9 h-9 rounded-xl bg-amber-500/20 flex items-center justify-center shrink-0">
+                              <Layers size={16} className="text-amber-400" />
+                            </div>
+                            <div>
+                              <p className="text-xs font-bold uppercase tracking-widest text-amber-400 mb-0.5">Entry Requirements for this course</p>
+                              <p className="text-sm text-amber-200 font-semibold">{selectedCourse.requirements}</p>
+                              <p className="text-xs text-gray-400 mt-1">Please upload documents that verify you meet these requirements (e.g. CV, certificates, transcripts).</p>
+                            </div>
+                          </div>
+                        </div>
                       )}
-                    </div>
 
-                    <div className="flex gap-4 pt-6 mt-4 border-t border-white/5">
-                      <button onClick={() => setStep('day')} className="w-1/3 py-4 px-4 btn-secondary text-sm font-bold">Back</button>
-                      <button onClick={handleDocumentSkipOrNext} className="w-2/3 btn-primary text-sm flex items-center justify-center gap-2 !py-4 font-bold">
-                        {formData.documentsAttached ? 'Continue to Details' : 'Skip & Continue'} <ChevronRight size={18} />
-                      </button>
-                    </div>
-                  </motion.div>
-                )}
+                      {/* Course Meta row */}
+                      {selectedCourse && (
+                        <div className="grid grid-cols-3 gap-3">
+                          <div className="glass-card-static bg-white/[0.02] border-white/5 rounded-xl p-3 text-center">
+                            <Clock size={14} className="text-purple-400 mx-auto mb-1" />
+                            <p className="text-[0.6rem] uppercase tracking-widest text-gray-500 font-bold">Duration</p>
+                            <p className="text-xs font-bold text-white mt-0.5">{selectedCourse.duration}</p>
+                          </div>
+                          <div className="glass-card-static bg-white/[0.02] border-white/5 rounded-xl p-3 text-center">
+                            <AlertCircle size={14} className="text-rose-400 mx-auto mb-1" />
+                            <p className="text-[0.6rem] uppercase tracking-widest text-gray-500 font-bold">Deadline</p>
+                            <p className="text-xs font-bold text-rose-300 mt-0.5">{selectedCourse.deadline}</p>
+                          </div>
+                          <div className="glass-card-static bg-white/[0.02] border-white/5 rounded-xl p-3 text-center">
+                            <Wifi size={14} className="text-cyan-400 mx-auto mb-1" />
+                            <p className="text-[0.6rem] uppercase tracking-widest text-gray-500 font-bold">Delivery</p>
+                            <p className="text-xs font-bold text-cyan-300 mt-0.5">{selectedCourse.delivery}</p>
+                          </div>
+                        </div>
+                      )}
+
+                      <div 
+                        className={`glass-card-static border-dashed border-2 rounded-2xl p-8 text-center transition-all duration-300 cursor-pointer relative overflow-hidden ${formData.documentsAttached ? 'border-green-500/40 bg-green-500/5' : 'border-white/10 hover:border-purple-500/40 bg-white/[0.02] hover:bg-purple-500/5'}`}
+                        onClick={() => !formData.documentsAttached && fileInputRef.current?.click()}
+                      >
+                        <input type="file" ref={fileInputRef} onChange={handleDocumentUpload} className="hidden" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" />
+                        {!formData.documentsAttached ? (
+                          <>
+                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-violet-600 flex items-center justify-center mx-auto mb-4 shadow-xl shadow-purple-500/20"><Upload size={24} className="text-white" /></div>
+                            <h4 className="text-white font-bold text-base mb-1">Upload your documents</h4>
+                            <p className="text-gray-500 text-xs mb-4">PDF, DOC, DOCX, JPG, PNG accepted</p>
+                            <button onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click() }} className="btn-secondary text-sm">Browse Files</button>
+                          </>
+                        ) : (
+                          <>
+                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center mx-auto mb-4 shadow-xl shadow-green-500/20"><CheckCircle2 size={28} className="text-white" /></div>
+                            <h4 className="text-green-400 font-bold text-base mb-1">Documents Attached</h4>
+                            <p className="text-green-500/60 text-xs mb-4">Your files are ready for review.</p>
+                            <button onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click() }} className="text-xs font-bold tracking-wide text-green-400 hover:text-green-300 transition-colors uppercase">Upload different files</button>
+                          </>
+                        )}
+                      </div>
+
+                      <div className="flex gap-4 pt-4 border-t border-white/5">
+                        <button onClick={() => setStep('day')} className="w-1/3 py-4 px-4 btn-secondary text-sm font-bold">Back</button>
+                        <button onClick={handleDocumentSkipOrNext} className="w-2/3 btn-primary text-sm flex items-center justify-center gap-2 !py-4 font-bold">
+                          {formData.documentsAttached ? 'Continue to Details' : 'Skip & Continue'} <ChevronRight size={18} />
+                        </button>
+                      </div>
+                    </motion.div>
+                  )
+                })()}
 
                 {step === 'personal' && (
                   <motion.div key="personal" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">

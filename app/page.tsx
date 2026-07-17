@@ -83,15 +83,6 @@ export default function Home() {
 
   useEffect(() => {
     setMounted(true)
-    if (courses.length === 0) {
-      useStore.setState({
-        courses: [
-          { id: '1', name: 'Web Development', description: 'Learn modern web technologies', cities: [{ id: '1', name: 'New York' }, { id: '2', name: 'Los Angeles' }], days: [{ id: '1', name: 'Monday', date: '2024-02-01' }, { id: '2', name: 'Wednesday', date: '2024-02-03' }] },
-          { id: '2', name: 'Mobile App Dev', description: 'Build iOS and Android apps', cities: [{ id: '2', name: 'Los Angeles' }, { id: '3', name: 'Chicago' }], days: [{ id: '2', name: 'Wednesday', date: '2024-02-03' }, { id: '3', name: 'Friday', date: '2024-02-05' }] },
-          { id: '3', name: 'Data Science', description: 'Master data analysis and ML', cities: [{ id: '1', name: 'New York' }, { id: '3', name: 'Chicago' }], days: [{ id: '1', name: 'Monday', date: '2024-02-01' }, { id: '3', name: 'Friday', date: '2024-02-05' }] },
-        ]
-      })
-    }
     const handleOpen = () => setIsRegistrationOpen(true)
     window.addEventListener('open-registration', handleOpen)
     return () => window.removeEventListener('open-registration', handleOpen)
@@ -134,8 +125,6 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#050510] relative">
-      <ParticleField />
-      <SpotlightCursor />
 
       <div className="relative z-10">
         <Navbar />
@@ -145,13 +134,7 @@ export default function Home() {
             HERO
             ════════════════════════════════════════ */}
         <section ref={heroRef} className="relative min-h-[95vh] flex items-center overflow-hidden aurora-bg">
-          <div className="absolute inset-0 mesh-gradient-intense" />
           <div className="absolute inset-0 grid-pattern" />
-
-          {/* Morphing Blobs */}
-          <FloatingOrb className="absolute top-10 left-[10%] w-[500px] h-[500px] rounded-full bg-purple-600/8 blur-[100px] morphing-blob" delay={0} />
-          <FloatingOrb className="absolute bottom-0 right-[5%] w-[600px] h-[600px] rounded-full bg-cyan-600/6 blur-[120px] morphing-blob" delay={3} />
-          <FloatingOrb className="absolute top-1/2 left-[50%] w-[400px] h-[400px] rounded-full bg-pink-600/5 blur-[80px] morphing-blob" delay={6} />
 
           <motion.div
             style={{ y: heroY, opacity: heroOpacity, scale: heroScale }}
@@ -544,8 +527,6 @@ export default function Home() {
             ════════════════════════════════════════ */}
         <section className="py-32 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
           <div className="absolute inset-0 mesh-gradient-intense" />
-          <FloatingOrb className="absolute top-0 left-[15%] w-[500px] h-[500px] rounded-full bg-purple-600/10 blur-[100px] morphing-blob" />
-          <FloatingOrb className="absolute bottom-0 right-[15%] w-[400px] h-[400px] rounded-full bg-cyan-600/8 blur-[100px] morphing-blob" delay={4} />
 
           <div className="relative z-10 max-w-4xl mx-auto text-center">
             <motion.div

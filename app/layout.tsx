@@ -2,6 +2,7 @@ import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import { Inter } from 'next/font/google'
+import { Providers } from '@/components/providers'
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -33,7 +34,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} bg-[#0a0a1a]`}>
       <body className="antialiased font-[family-name:var(--font-inter)] noise-overlay">
-        {children}
+        <Providers>
+          {children}
+        </Providers>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>
