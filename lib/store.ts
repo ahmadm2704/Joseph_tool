@@ -70,64 +70,137 @@ interface AppStore {
 
 const initialCourses: Course[] = [
   {
-    id: 'e6b8c9d0-1234-4567-890a-bcdef1234561',
-    name: 'Business and Tourism with Foundation',
-    description: 'A comprehensive 4-year foundation program covering business principles and the tourism industry.',
-    duration: '4 Years',
-    deadline: '12 September',
-    delivery: 'Blended',
-    daysSchedule: 'Flexible Schedule',
-    requirements: 'No work reference or Level 3',
-    cities: [{ id: 'loc-1', name: 'London' }, { id: 'loc-2', name: 'Manchester' }],
-    days: [{ id: 'day-1', name: 'Monday & Wednesday', date: 'Blended' }, { id: 'day-2', name: 'Tuesday & Thursday', date: 'Blended' }],
-  },
-  {
-    id: 'e6b8c9d0-1234-4567-890a-bcdef1234562',
-    name: 'HND Business / LM / HM / Digital Technology',
-    description: 'A 2-year Higher National Diploma covering Business, Leadership & Management, Hospitality, and Digital Technology.',
+    id: 'c1000000-0000-0000-0000-000000000001',
+    name: 'HND Business',
+    description: 'Higher National Diploma in Business. Limited places available – apply early.',
     duration: '2 Years',
-    deadline: '25 September',
+    deadline: 'September or October 2026',
     delivery: 'Blended',
-    daysSchedule: 'Flexible Schedule',
-    requirements: '5 years work experience or Level 3',
-    cities: [{ id: 'loc-1', name: 'London' }, { id: 'loc-2', name: 'Manchester' }],
-    days: [{ id: 'day-1', name: 'Monday & Wednesday', date: 'Blended' }, { id: 'day-2', name: 'Tuesday & Thursday', date: 'Blended' }],
+    daysSchedule: 'Flexible',
+    requirements: 'Standard Entry',
+    cities: [
+      { id: 'loc-1', name: 'Leicester' },
+      { id: 'loc-2', name: 'Nottingham' },
+      { id: 'loc-3', name: 'Birmingham' }
+    ],
+    days: [
+      { id: 'day-1', name: 'September 2026 Start', date: 'Sep 2026' },
+      { id: 'day-2', name: 'October 2026 Start', date: 'Oct 2026' }
+    ],
   },
   {
-    id: 'e6b8c9d0-1234-4567-890a-bcdef1234563',
-    name: 'NCC Diploma Business Level 4',
-    description: 'A 1-year NCC accredited diploma for business professionals seeking to advance their career to Level 4.',
-    duration: '1 Year',
-    deadline: '25 August',
+    id: 'c1000000-0000-0000-0000-000000000002',
+    name: 'FDA Business',
+    description: 'Foundation Degree in Business. Limited places available – apply early.',
+    duration: '2 Years',
+    deadline: 'September or October 2026',
     delivery: 'Blended',
-    daysSchedule: 'Flexible Schedule',
-    requirements: '5 years work experience or Level 3',
-    cities: [{ id: 'loc-1', name: 'London' }, { id: 'loc-2', name: 'Manchester' }],
-    days: [{ id: 'day-1', name: 'Monday & Wednesday', date: 'Blended' }, { id: 'day-2', name: 'Tuesday & Thursday', date: 'Blended' }],
+    daysSchedule: 'Flexible',
+    requirements: 'Standard Entry',
+    cities: [
+      { id: 'loc-1', name: 'Leicester' },
+      { id: 'loc-2', name: 'Nottingham' },
+      { id: 'loc-3', name: 'Birmingham' }
+    ],
+    days: [
+      { id: 'day-1', name: 'September 2026 Start', date: 'Sep 2026' },
+      { id: 'day-2', name: 'October 2026 Start', date: 'Oct 2026' }
+    ],
   },
   {
-    id: 'e6b8c9d0-1234-4567-890a-bcdef1234564',
-    name: 'Data Analyst Level 4',
-    description: 'A 1-year intensive data analytics program covering tools, techniques, and industry-standard frameworks.',
-    duration: '1 Year',
-    deadline: '25 August',
+    id: 'c1000000-0000-0000-0000-000000000003',
+    name: 'Business & Tourism',
+    description: 'Comprehensive program in Business & Tourism. Limited places available – apply early.',
+    duration: '3 Years',
+    deadline: 'September or October 2026',
     delivery: 'Blended',
-    daysSchedule: 'Tuesday On-Campus & Saturday Online',
-    requirements: '5 years work experience or Level 3',
-    cities: [{ id: 'loc-1', name: 'London' }, { id: 'loc-2', name: 'Manchester' }],
-    days: [{ id: 'day-1', name: 'Tuesday (On-Campus)', date: 'On-Campus' }, { id: 'day-2', name: 'Saturday (Online)', date: 'Online' }],
+    daysSchedule: 'Flexible',
+    requirements: 'Standard Entry',
+    cities: [
+      { id: 'loc-1', name: 'Leicester' },
+      { id: 'loc-2', name: 'Nottingham' },
+      { id: 'loc-3', name: 'Birmingham' }
+    ],
+    days: [
+      { id: 'day-1', name: 'September 2026 Start', date: 'Sep 2026' },
+      { id: 'day-2', name: 'October 2026 Start', date: 'Oct 2026' }
+    ],
   },
   {
-    id: 'e6b8c9d0-1234-4567-890a-bcdef1234565',
-    name: 'Top Up Level 6',
-    description: 'A 1-year top-up program designed for Level 5 certificate holders to achieve a full Level 6 qualification.',
-    duration: '1 Year',
-    deadline: '10 September',
+    id: 'c1000000-0000-0000-0000-000000000004',
+    name: 'Fashion Design',
+    description: 'Degree in Fashion Design. Limited places available – apply early.',
+    duration: '3 Years',
+    deadline: 'September or October 2026',
+    delivery: 'On-Campus',
+    daysSchedule: 'Full-time',
+    requirements: 'Standard Entry / Portfolio',
+    cities: [
+      { id: 'loc-1', name: 'Leicester' },
+      { id: 'loc-2', name: 'Nottingham' },
+      { id: 'loc-3', name: 'Birmingham' }
+    ],
+    days: [
+      { id: 'day-1', name: 'September 2026 Start', date: 'Sep 2026' },
+      { id: 'day-2', name: 'October 2026 Start', date: 'Oct 2026' }
+    ],
+  },
+  {
+    id: 'c1000000-0000-0000-0000-000000000005',
+    name: 'Business with Foundation Year',
+    description: '4-year Business degree including a foundation year. Limited places available – apply early.',
+    duration: '4 Years',
+    deadline: 'September or October 2026',
     delivery: 'Blended',
-    daysSchedule: 'Flexible Schedule',
-    requirements: 'Level 5 Certificate',
-    cities: [{ id: 'loc-1', name: 'London' }, { id: 'loc-2', name: 'Manchester' }],
-    days: [{ id: 'day-1', name: 'Monday & Wednesday', date: 'Blended' }, { id: 'day-2', name: 'Tuesday & Thursday', date: 'Blended' }],
+    daysSchedule: 'Flexible',
+    requirements: 'No standard entry requirements',
+    cities: [
+      { id: 'loc-1', name: 'Leicester' },
+      { id: 'loc-2', name: 'Nottingham' },
+      { id: 'loc-3', name: 'Birmingham' }
+    ],
+    days: [
+      { id: 'day-1', name: 'September 2026 Start', date: 'Sep 2026' },
+      { id: 'day-2', name: 'October 2026 Start', date: 'Oct 2026' }
+    ],
+  },
+  {
+    id: 'c1000000-0000-0000-0000-000000000006',
+    name: 'Security Door Supervisor Course',
+    description: 'Certification for Security Door Supervision. Limited places available – apply early.',
+    duration: 'Short Course',
+    deadline: 'September or October 2026',
+    delivery: 'On-Campus',
+    daysSchedule: 'Intensive',
+    requirements: 'Standard Entry',
+    cities: [
+      { id: 'loc-1', name: 'Leicester' },
+      { id: 'loc-2', name: 'Nottingham' },
+      { id: 'loc-3', name: 'Birmingham' }
+    ],
+    days: [
+      { id: 'day-1', name: 'September 2026 Start', date: 'Sep 2026' },
+      { id: 'day-2', name: 'October 2026 Start', date: 'Oct 2026' }
+    ],
+  },
+  {
+    id: 'c1000000-0000-0000-0000-000000000007',
+    name: 'Master’s Degree (Postgraduate)',
+    description: 'Postgraduate Master’s program. Limited places available – apply early.',
+    duration: '1-2 Years',
+    deadline: 'September or October 2026',
+    delivery: 'Blended',
+    daysSchedule: 'Flexible',
+    requirements: 'Bachelor’s Degree',
+    cities: [
+      { id: 'loc-1', name: 'Leicester' },
+      { id: 'loc-2', name: 'Nottingham' },
+      { id: 'loc-3', name: 'Birmingham' }
+    ],
+    days: [
+      { id: 'day-1', name: 'September 2026 Start', date: 'Sep 2026' },
+      { id: 'day-2', name: 'October 2026 Start', date: 'Oct 2026' }
+    ],
   }
 ]
 
