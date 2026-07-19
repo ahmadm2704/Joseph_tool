@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import AdminSidebar from '@/components/admin-sidebar'
 import { useStore } from '@/lib/store'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Trash2, Download, Eye, X, Users, Search, Mail, Phone, MapPin, Calendar, BookOpen, Sparkles, FileCheck, Map } from 'lucide-react'
+import { Trash2, Download, Eye, X, Users, User, Search, Mail, Phone, MapPin, Calendar, BookOpen, Sparkles, FileCheck, Map } from 'lucide-react'
 
 export default function RegistrationsManagement() {
   const router = useRouter()
@@ -41,7 +41,7 @@ export default function RegistrationsManagement() {
   }
 
   const handleExportCSV = () => {
-    const headers = ['First Name', 'Last Name', 'Email', 'Phone', 'Address', 'Course', 'Location', 'Schedule', 'Documents', 'Date']
+    const headers = ['First Name', 'Last Name', 'Email', 'Phone', 'Address', 'Course', 'Location', 'Schedule', 'Citizenship', 'Qualification', 'Date']
     const rows = registrations.map(reg => [
       reg.firstName,
       reg.lastName,
@@ -51,6 +51,7 @@ export default function RegistrationsManagement() {
       `"${getCourseName(reg.courseId)}"`,
       `"${getCityName(reg.courseId, reg.cityId)}"`,
       `"${getDayName(reg.courseId, reg.dayId)}"`,
+      `"${reg.citizenshipStatus || 'N/A'}"`,
       reg.documentsAttached ? 'Yes' : 'No',
       new Date(reg.createdAt).toLocaleDateString(),
     ])
@@ -261,12 +262,37 @@ export default function RegistrationsManagement() {
                       <FileCheck size={14} className={selected.documentsAttached ? 'text-green-400' : 'text-gray-500'} />
                     </div>
                     <div>
-                      <p className="text-[0.65rem] font-bold uppercase tracking-widest text-gray-500">Documents</p>
+                      <p className="text-[0.65rem] font-bold uppercase tracking-widest text-gray-500">Qualification</p>
                       <p className={`text-sm font-bold mt-0.5 ${selected.documentsAttached ? 'text-green-400' : 'text-gray-500'}`}>
                         {selected.documentsAttached ? 'Submitted' : 'Not submitted'}
                       </p>
                     </div>
                   </div>
+
+                  <div className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/5">
+                    <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center shrink-0">
+                      <User size={14} className={selected.citizenshipStatus ? 'text-blue-400' : 'text-gray-500'} />
+                    </div>
+                    <div>
+                      <p className="text-[0.65rem] font-bold uppercase tracking-widest text-gray-500">Citizenship Status</p>
+                      <p className={`text-sm font-bold mt-0.5 ${selected.citizenshipStatus ? 'text-white' : 'text-gray-500'}`}>
+                        {selected.citizenshipStatus || 'Not specified'}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {selected.documentUrls && selected.documentUrls.length > 0 && (
+                    <div className="col-span-2 flex flex-col gap-2 p-3 rounded-xl bg-white/[0.02] border border-white/5">
+                      <p className="text-[0.65rem] font-bold uppercase tracking-widest text-gray-500">Attached Documents</p>
+                      <div className="flex flex-col gap-2 mt-1">
+                        {selected.documentUrls.map((url, idx) => (
+                          <a key={idx} href={url} target="_blank" rel="noreferrer" className="text-sm text-purple-400 hover:text-purple-300 underline break-all flex items-center gap-2">
+                            <FileCheck size={14} /> Document {idx + 1}
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <button

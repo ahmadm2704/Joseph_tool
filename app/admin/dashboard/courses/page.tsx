@@ -106,7 +106,7 @@ export default function CoursesManagement() {
       setCourses(updated)
     } else {
       const course: Course = {
-        id: Date.now().toString(),
+        id: crypto.randomUUID(),
         name: form.name,
         description: form.description,
         duration: form.duration,

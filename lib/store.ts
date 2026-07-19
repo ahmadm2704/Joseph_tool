@@ -43,6 +43,8 @@ export interface StudentRegistration {
   phone: string
   address: string
   documentsAttached: boolean
+  documentUrls?: string[]
+  citizenshipStatus?: string
   createdAt: string
 }
 
@@ -177,7 +179,8 @@ export const useStore = create<AppStore>()(
           email: registration.email,
           phone: registration.phone,
           address: registration.address,
-          document_url: null,
+          document_url: registration.documentUrls ? registration.documentUrls.join(',') : null,
+          citizenship_status: registration.citizenshipStatus || null,
           created_at: registration.createdAt
         })
         if (error) console.error("Error inserting registration", error)
@@ -249,6 +252,8 @@ export const useStore = create<AppStore>()(
               phone: r.phone,
               address: r.address,
               documentsAttached: !!r.document_url,
+              documentUrls: r.document_url ? r.document_url.split(',') : [],
+              citizenshipStatus: r.citizenship_status || '',
               createdAt: r.created_at
             }))
             set({ registrations: mappedRegs })

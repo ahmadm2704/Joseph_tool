@@ -2,8 +2,9 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, BookOpen, MapPin, Calendar, User, ChevronRight, CheckCircle2, Building, Mail, Phone, Map, FileText, Upload, Sparkles, Star, Clock, AlertCircle, Layers, Wifi } from 'lucide-react'
+import { X, BookOpen, MapPin, Calendar, User, ChevronRight, CheckCircle2, Building, Mail, Phone, Map, FileText, Upload, UploadCloud, FileCheck, Sparkles, Star, Clock, AlertCircle, Layers, Wifi } from 'lucide-react'
 import { useStore, Course, City, Day } from '@/lib/store'
+import { supabase } from '@/lib/supabase'
 
 interface RegistrationModalProps {
   isOpen: boolean
@@ -11,7 +12,7 @@ interface RegistrationModalProps {
   courses: Course[]
 }
 
-type FormStep = 'course' | 'city' | 'day' | 'personal' | 'documents' | 'success'
+type FormStep = 'course' | 'city' | 'day' | 'documents' | 'qualification' | 'personal' | 'success'
 
 interface FormData {
   courseId: string
@@ -22,6 +23,8 @@ interface FormData {
   email: string
   phone: string
   address: string
+  citizenshipStatus: string
+  citizenshipDocsAttached: boolean
   documentsAttached: boolean
 }
 
@@ -30,13 +33,18 @@ const steps = [
   { id: 'city', label: 'Location', icon: MapPin },
   { id: 'day', label: 'Schedule', icon: Calendar },
   { id: 'documents', label: 'Documents', icon: FileText },
+  { id: 'qualification', label: 'Qualification', icon: FileText },
   { id: 'personal', label: 'Details', icon: User },
 ]
 
 export default function RegistrationModal({ isOpen, onClose, courses }: RegistrationModalProps) {
   const [step, setStep] = useState<FormStep>('course')
-  const [formData, setFormData] = useState<FormData>({ courseId: '', cityId: '', dayId: '', firstName: '', lastName: '', email: '', phone: '', address: '', documentsAttached: false })
+  const [formData, setFormData] = useState<FormData>({ courseId: '', cityId: '', dayId: '', firstName: '', lastName: '', email: '', phone: '', address: '', citizenshipStatus: '', citizenshipDocsAttached: false, documentsAttached: false })
   const [focused, setFocused] = useState<string | null>(null)
+  const [citizenshipFiles, setCitizenshipFiles] = useState<File[]>([])
+  const [qualificationFiles, setQualificationFiles] = useState<File[]>([])
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const citizenshipFileInputRef = useRef<HTMLInputElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { addRegistration } = useStore()
 
@@ -53,19 +61,56 @@ export default function RegistrationModal({ isOpen, onClose, courses }: Registra
   const handleCitySelect = (cityId: string) => { setFormData({ ...formData, cityId, dayId: '' }); setStep('day') }
   const handleDaySelect = (dayId: string) => { setFormData({ ...formData, dayId }); setStep('documents') }
   const handlePersonalChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => { setFormData({ ...formData, [e.target.name]: e.target.value }) }
+  const handleCitizenshipSkipOrNext = () => { setStep('qualification') }
   const handleDocumentSkipOrNext = () => { setStep('personal') }
-  const handleDocumentUpload = (e: React.ChangeEvent<HTMLInputElement>) => { if (e.target.files && e.target.files.length > 0) setFormData({ ...formData, documentsAttached: true }) }
+  const handleCitizenshipDocumentUpload = (e: React.ChangeEvent<HTMLInputElement>) => { 
+    if (e.target.files && e.target.files.length > 0) {
+      setCitizenshipFiles(Array.from(e.target.files))
+      setFormData({ ...formData, citizenshipDocsAttached: true }) 
+    } 
+  }
+  const handleDocumentUpload = (e: React.ChangeEvent<HTMLInputElement>) => { 
+    if (e.target.files && e.target.files.length > 0) {
+      setQualificationFiles(Array.from(e.target.files))
+      setFormData({ ...formData, documentsAttached: true }) 
+    } 
+  }
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (formData.firstName && formData.lastName && formData.email && formData.phone && formData.address) {
-      addRegistration({ id: Date.now().toString(), ...formData, createdAt: new Date().toISOString() })
-      setStep('success')
+      setIsSubmitting(true)
+      try {
+        const fileUrls: string[] = []
+        const allFiles = [...citizenshipFiles, ...qualificationFiles]
+        
+        for (const file of allFiles) {
+          const fileExt = file.name.split('.').pop()
+          const fileName = `${crypto.randomUUID()}.${fileExt}`
+          const { data, error } = await supabase.storage.from('documents').upload(fileName, file)
+          
+          if (data) {
+            const { data: urlData } = supabase.storage.from('documents').getPublicUrl(fileName)
+            if (urlData) {
+              fileUrls.push(urlData.publicUrl)
+            }
+          }
+        }
+        
+        await addRegistration({ id: crypto.randomUUID(), ...formData, documentUrls: fileUrls, createdAt: new Date().toISOString() })
+        setStep('success')
+      } catch (error) {
+        console.error("Upload error", error)
+      } finally {
+        setIsSubmitting(false)
+      }
     }
   }
 
   const handleClose = () => {
     setStep('course')
-    setFormData({ courseId: '', cityId: '', dayId: '', firstName: '', lastName: '', email: '', phone: '', address: '', documentsAttached: false })
+    setFormData({ courseId: '', cityId: '', dayId: '', firstName: '', lastName: '', email: '', phone: '', address: '', citizenshipStatus: '', citizenshipDocsAttached: false, documentsAttached: false })
+    setCitizenshipFiles([])
+    setQualificationFiles([])
     onClose()
   }
 
@@ -242,12 +287,113 @@ export default function RegistrationModal({ isOpen, onClose, courses }: Registra
                 )}
 
                 {step === 'documents' && (() => {
-                  const selectedCourse = courses.find((c: Course) => c.id === formData.courseId)
                   return (
                     <motion.div key="documents" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-5">
                       <div>
-                        <h3 className="text-xl font-bold text-white mb-1 flex items-center gap-2 tracking-tight"><FileText className="text-purple-400" size={20} /> Document Submission</h3>
-                        <p className="text-gray-400 text-sm">Please upload the required documents to support your application.</p>
+                        <h3 className="text-xl font-bold text-white flex items-center gap-2 tracking-tight">
+                          <FileText className="text-purple-400" size={20} /> Required Documents
+                        </h3>
+                        <p className="text-gray-400 text-sm">Please select your status to see required documents.</p>
+                      </div>
+
+                      <div className="space-y-3">
+                        {['British Citizens', 'Non-British Students', 'Students with ILR', 'Pre-Settled Status Applicants'].map((status) => (
+                          <label key={status} className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-all ${formData.citizenshipStatus === status ? 'border-purple-500 bg-purple-500/10' : 'border-white/10 glass bg-white/5 hover:border-white/20'}`}>
+                            <input type="radio" name="citizenshipStatus" value={status} checked={formData.citizenshipStatus === status} onChange={(e) => setFormData({ ...formData, citizenshipStatus: e.target.value })} className="hidden" />
+                            <div className={`w-5 h-5 rounded-full border flex items-center justify-center ${formData.citizenshipStatus === status ? 'border-purple-500' : 'border-gray-500'}`}>
+                              {formData.citizenshipStatus === status && <div className="w-2.5 h-2.5 rounded-full bg-purple-500" />}
+                            </div>
+                            <span className="text-white text-sm font-medium">{status}</span>
+                          </label>
+                        ))}
+                      </div>
+
+                      {formData.citizenshipStatus && (
+                        <div className="mt-4 p-5 rounded-xl glass bg-white/5 border border-white/10">
+                          <h4 className="text-white font-bold mb-3 text-sm">Required Documents:</h4>
+                          <ul className="list-disc list-inside text-gray-400 text-sm space-y-1.5 mb-5">
+                            {formData.citizenshipStatus === 'British Citizens' && (
+                              <>
+                                <li>Passport</li>
+                                <li>Proof of Address</li>
+                                <li>National Insurance Number</li>
+                              </>
+                            )}
+                            {formData.citizenshipStatus === 'Non-British Students' && (
+                              <>
+                                <li>Passport</li>
+                                <li>Share Code</li>
+                                <li>Proof of Address</li>
+                                <li>National Insurance Number</li>
+                                <li>Work Reference (if currently working)</li>
+                                <li className="text-purple-400 mt-3 list-none font-medium flex gap-2"><MapPin size={16}/> You must have lived in the UK for at least 3 years</li>
+                              </>
+                            )}
+                            {formData.citizenshipStatus === 'Students with ILR' && (
+                              <>
+                                <li>Passport</li>
+                                <li>ILR (Indefinite Leave to Remain)</li>
+                                <li>Share Code</li>
+                                <li>Proof of Address</li>
+                                <li>National Insurance Number</li>
+                              </>
+                            )}
+                            {formData.citizenshipStatus === 'Pre-Settled Status Applicants' && (
+                              <>
+                                <li className="list-none mb-2 font-medium text-gray-300">You must provide:</li>
+                                <li>Last 3 months payslips</li>
+                                <li>Employer contract</li>
+                                <li>Last 2 years P60</li>
+                              </>
+                            )}
+                          </ul>
+                          <p className="text-green-400 text-xs font-medium mb-5 flex items-center gap-1.5"><CheckCircle2 size={14}/> Make sure all documents are valid and up to date before applying</p>
+
+                          <div 
+                            className={`glass-card-static border-dashed border-2 rounded-2xl p-6 text-center transition-all duration-300 cursor-pointer relative overflow-hidden ${formData.citizenshipDocsAttached ? 'border-green-500/40 bg-green-500/5' : 'border-white/10 hover:border-purple-500/40 bg-white/[0.02] hover:bg-purple-500/5'}`}
+                            onClick={() => !formData.citizenshipDocsAttached && citizenshipFileInputRef.current?.click()}
+                          >
+                            <input type="file" ref={citizenshipFileInputRef} onChange={handleCitizenshipDocumentUpload} className="hidden" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" />
+                            {!formData.citizenshipDocsAttached ? (
+                              <>
+                                <div className="w-10 h-10 rounded-full glass bg-white/5 mx-auto flex items-center justify-center mb-2 group-hover:scale-110 group-hover:bg-purple-500/20 transition-all duration-300">
+                                  <UploadCloud className="text-purple-400" size={20} />
+                                </div>
+                                <h4 className="text-white font-bold text-sm mb-1">Upload Documents</h4>
+                                <p className="text-gray-500 text-[0.6rem]">PDF, DOC, DOCX, JPG, PNG accepted</p>
+                              </>
+                            ) : (
+                              <>
+                                <div className="w-10 h-10 rounded-full bg-green-500/20 mx-auto flex items-center justify-center mb-2 ring-4 ring-green-500/10">
+                                  <FileCheck className="text-green-400" size={20} />
+                                </div>
+                                <h4 className="text-green-400 font-bold text-sm mb-1">Documents Attached</h4>
+                                <p className="text-gray-400 text-[0.65rem]">Files are ready to submit</p>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="flex gap-3 pt-4 border-t border-white/5">
+                        <button onClick={() => setStep('day')} className="w-1/3 py-4 px-4 btn-secondary text-sm font-bold">Back</button>
+                        <button onClick={handleCitizenshipSkipOrNext} className="w-2/3 btn-primary text-sm flex items-center justify-center gap-2 !py-4 font-bold">
+                          {formData.citizenshipDocsAttached ? 'Continue' : 'Skip & Continue'} <ChevronRight size={18} />
+                        </button>
+                      </div>
+                    </motion.div>
+                  )
+                })()}
+
+                {step === 'qualification' && (() => {
+                  const selectedCourse = courses.find((c: Course) => c.id === formData.courseId)
+                  return (
+                    <motion.div key="qualification" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-5">
+                      <div>
+                        <h3 className="text-xl font-bold text-white flex items-center gap-2 tracking-tight">
+                          <FileText className="text-purple-400" size={20} /> Upload Qualifications
+                        </h3>
+                        <p className="text-gray-400 text-sm">Please upload the required qualifications to support your application.</p>
                       </div>
 
                       {/* Entry Requirements Banner */}
@@ -294,23 +440,28 @@ export default function RegistrationModal({ isOpen, onClose, courses }: Registra
                         <input type="file" ref={fileInputRef} onChange={handleDocumentUpload} className="hidden" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" />
                         {!formData.documentsAttached ? (
                           <>
-                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-violet-600 flex items-center justify-center mx-auto mb-4 shadow-xl shadow-purple-500/20"><Upload size={24} className="text-white" /></div>
-                            <h4 className="text-white font-bold text-base mb-1">Upload your documents</h4>
-                            <p className="text-gray-500 text-xs mb-4">PDF, DOC, DOCX, JPG, PNG accepted</p>
-                            <button onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click() }} className="btn-secondary text-sm">Browse Files</button>
+                            <div className="w-12 h-12 rounded-full glass bg-white/5 mx-auto flex items-center justify-center mb-3 group-hover:scale-110 group-hover:bg-purple-500/20 transition-all duration-300">
+                              <UploadCloud className="text-purple-400" size={24} />
+                            </div>
+                            <h4 className="text-white font-bold text-base mb-1">Upload your qualifications</h4>
+                            <p className="text-gray-400 text-xs">Click to browse or drag and drop</p>
+                            <p className="text-gray-500 text-[0.6rem] mt-2">PDF, DOC, DOCX, JPG, PNG accepted</p>
+                            <button onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click() }} className="btn-secondary text-sm mt-4">Browse Files</button>
                           </>
                         ) : (
                           <>
-                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center mx-auto mb-4 shadow-xl shadow-green-500/20"><CheckCircle2 size={28} className="text-white" /></div>
-                            <h4 className="text-green-400 font-bold text-base mb-1">Documents Attached</h4>
-                            <p className="text-green-500/60 text-xs mb-4">Your files are ready for review.</p>
+                            <div className="w-12 h-12 rounded-full bg-green-500/20 mx-auto flex items-center justify-center mb-3 ring-4 ring-green-500/10">
+                              <FileCheck className="text-green-400" size={24} />
+                            </div>
+                            <h4 className="text-green-400 font-bold text-base mb-1">Qualifications Attached</h4>
+                            <p className="text-gray-400 text-xs mb-4">Your files are ready to submit</p>
                             <button onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click() }} className="text-xs font-bold tracking-wide text-green-400 hover:text-green-300 transition-colors uppercase">Upload different files</button>
                           </>
                         )}
                       </div>
 
-                      <div className="flex gap-4 pt-4 border-t border-white/5">
-                        <button onClick={() => setStep('day')} className="w-1/3 py-4 px-4 btn-secondary text-sm font-bold">Back</button>
+                      <div className="flex gap-3 pt-6 border-t border-white/5">
+                        <button onClick={() => setStep('documents')} className="w-1/3 py-4 px-4 btn-secondary text-sm font-bold">Back</button>
                         <button onClick={handleDocumentSkipOrNext} className="w-2/3 btn-primary text-sm flex items-center justify-center gap-2 !py-4 font-bold">
                           {formData.documentsAttached ? 'Continue to Details' : 'Skip & Continue'} <ChevronRight size={18} />
                         </button>
@@ -361,9 +512,13 @@ export default function RegistrationModal({ isOpen, onClose, courses }: Registra
                     </div>
 
                     <div className="flex gap-4 pt-6 mt-4 border-t border-white/5">
-                      <button onClick={() => setStep('documents')} className="w-1/3 py-4 px-4 btn-secondary text-sm font-bold">Back</button>
-                      <button onClick={handleSubmit} disabled={!formData.firstName || !formData.lastName || !formData.email || !formData.phone || !formData.address} className="w-2/3 btn-primary text-sm flex items-center justify-center gap-2 !py-4 font-bold disabled:opacity-30 disabled:cursor-not-allowed">
-                        <CheckCircle2 size={18} /> Complete Registration
+                      <button onClick={() => setStep('qualification')} className="w-1/3 py-4 px-4 btn-secondary text-sm font-bold" disabled={isSubmitting}>Back</button>
+                      <button onClick={handleSubmit} disabled={!formData.firstName || !formData.lastName || !formData.email || !formData.phone || !formData.address || isSubmitting} className="w-2/3 btn-primary text-sm flex items-center justify-center gap-2 !py-4 font-bold disabled:opacity-30 disabled:cursor-not-allowed">
+                        {isSubmitting ? (
+                          <span className="flex items-center gap-2"><div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"/> Submitting...</span>
+                        ) : (
+                          <><CheckCircle2 size={18} /> Complete Registration</>
+                        )}
                       </button>
                     </div>
                   </motion.div>
