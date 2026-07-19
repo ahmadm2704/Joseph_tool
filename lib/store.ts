@@ -256,7 +256,7 @@ export const useStore = create<AppStore>()(
           citizenship_status: registration.citizenshipStatus || null,
           created_at: registration.createdAt
         })
-        if (error) console.error("Error inserting registration", error)
+        if (error) console.error("Error inserting registration:", error.message, error.details)
       },
 
       removeRegistration: async (id) => {
@@ -274,8 +274,8 @@ export const useStore = create<AppStore>()(
             supabase.from('registrations').select('*')
           ])
 
-          if (coursesRes.data && coursesRes.data.length > 0) {
-            const mappedCourses = coursesRes.data.map(c => ({
+          if (coursesRes.data) {
+            let currentCourses = coursesRes.data.map(c => ({
               id: c.id,
               name: c.name,
               description: c.description,
@@ -287,30 +287,36 @@ export const useStore = create<AppStore>()(
               cities: c.cities || [],
               days: c.days || []
             }))
-            set({ courses: mappedCourses })
-          } else if (coursesRes.data && coursesRes.data.length === 0) {
-            // Database is empty, let's seed it with the default initial courses!
-            console.log('Seeding initial courses to Supabase...')
-            for (const course of initialCourses) {
-              const { error } = await supabase.from('courses').insert({
-                id: course.id,
-                name: course.name,
-                description: course.description,
-                duration: course.duration,
-                deadline: course.deadline,
-                delivery: course.delivery,
-                days_schedule: course.daysSchedule,
-                requirements: course.requirements,
-                cities: course.cities,
-                days: course.days
-              })
-              if (error) {
-                console.error("FAILED TO SEED COURSE:", course.name, error.message, error.details)
-              } else {
-                console.log("Successfully seeded course:", course.name)
+            
+            // Check for missing initial courses and seed them
+            const existingIds = new Set(currentCourses.map(c => c.id))
+            const missingCourses = initialCourses.filter(c => !existingIds.has(c.id))
+            
+            if (missingCourses.length > 0) {
+              console.log(`Seeding ${missingCourses.length} missing initial courses...`)
+              for (const course of missingCourses) {
+                const { error } = await supabase.from('courses').insert({
+                  id: course.id,
+                  name: course.name,
+                  description: course.description,
+                  duration: course.duration,
+                  deadline: course.deadline,
+                  delivery: course.delivery,
+                  days_schedule: course.daysSchedule,
+                  requirements: course.requirements,
+                  cities: course.cities,
+                  days: course.days
+                })
+                if (error) {
+                  console.error("FAILED TO SEED COURSE:", course.name, error.message, error.details)
+                } else {
+                  console.log("Successfully seeded course:", course.name)
+                  currentCourses.push(course)
+                }
               }
             }
-            set({ courses: initialCourses })
+            
+            set({ courses: currentCourses })
           }
 
           if (regRes.data) {
