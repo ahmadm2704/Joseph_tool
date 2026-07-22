@@ -62,6 +62,8 @@ export interface ContactMessage {
 
 interface AppStore {
   courses: Course[]
+  cities: City[]
+  days: Day[]
   galleryImages: GalleryImage[]
   registrations: StudentRegistration[]
   contactMessages: ContactMessage[]
@@ -69,6 +71,14 @@ interface AppStore {
   addCourse: (course: Course) => Promise<void>
   removeCourse: (id: string) => Promise<void>
   setCourses: (courses: Course[]) => void
+
+  addCity: (city: City) => void
+  removeCity: (id: string) => void
+  setCities: (cities: City[]) => void
+
+  addDay: (day: Day) => void
+  removeDay: (id: string) => void
+  setDays: (days: Day[]) => void
 
   addGalleryImage: (image: GalleryImage) => void
   removeGalleryImage: (id: string) => void
@@ -225,9 +235,27 @@ export const useStore = create<AppStore>()(
   persist(
     (set, get) => ({
       courses: initialCourses,
+      cities: [
+        { id: 'loc-1', name: 'Leicester' },
+        { id: 'loc-2', name: 'Nottingham' },
+        { id: 'loc-3', name: 'Birmingham' },
+        { id: 'loc-4', name: 'London' }
+      ],
+      days: [
+        { id: 'day-1', name: 'September 2026 Start', date: 'Sep 2026' },
+        { id: 'day-2', name: 'October 2026 Start', date: 'Oct 2026' }
+      ],
       galleryImages: [],
       registrations: [],
       contactMessages: [],
+
+      addCity: (city) => set((state) => ({ cities: [...state.cities, city] })),
+      removeCity: (id) => set((state) => ({ cities: state.cities.filter((c) => c.id !== id) })),
+      setCities: (cities) => set({ cities }),
+
+      addDay: (day) => set((state) => ({ days: [...state.days, day] })),
+      removeDay: (id) => set((state) => ({ days: state.days.filter((d) => d.id !== id) })),
+      setDays: (days) => set({ days }),
 
       addCourse: async (course) => {
         set((state) => ({ courses: [...state.courses, course] }))

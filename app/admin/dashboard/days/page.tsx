@@ -42,7 +42,7 @@ export default function DaysManagement() {
   }
 
   const handleExportCSV = () => {
-    const csv = ['Day Name,Date', ...days.map(d => `${d.name},${d.date}`)].join('\n')
+    const csv = ['Day Name,Date', ...days.map((d: Day) => `${d.name},${d.date}`)].join('\n')
     const blob = new Blob([csv], { type: 'text/csv' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -158,7 +158,7 @@ export default function DaysManagement() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
-                    {days.map((day) => (
+                    {days.map((day: Day) => (
                       <tr key={day.id} className="hover:bg-gray-50">
                         <td className="px-6 py-3 text-gray-900 font-semibold">{day.name}</td>
                         <td className="px-6 py-3 text-gray-600">{new Date(day.date).toLocaleDateString()}</td>

@@ -41,7 +41,7 @@ export default function CitiesManagement() {
   }
 
   const handleExportCSV = () => {
-    const csv = ['City Name', ...cities.map(c => c.name)].join('\n')
+    const csv = ['City Name', ...cities.map((c: City) => c.name)].join('\n')
     const blob = new Blob([csv], { type: 'text/csv' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -147,7 +147,7 @@ export default function CitiesManagement() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
-                    {cities.map((city) => (
+                    {cities.map((city: City) => (
                       <tr key={city.id} className="hover:bg-gray-50">
                         <td className="px-6 py-3 text-gray-900 font-semibold">{city.name}</td>
                         <td className="px-6 py-3 text-center">
