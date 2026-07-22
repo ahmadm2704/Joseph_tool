@@ -128,7 +128,7 @@ export default function CoursesManagement() {
   const [newIDCatName, setNewIDCatName] = useState('')
   const [newQualCatName, setNewQualCatName] = useState('')
 
-  const { courses, addCourse, removeCourse, setCourses } = useStore()
+  const { courses, addCourse, removeCourse, setCourses, updateCourse } = useStore()
 
   useEffect(() => {
     const session = localStorage.getItem('adminSession')
@@ -312,26 +312,23 @@ export default function CoursesManagement() {
     })).filter(c => c.categoryName.trim() !== '')
 
     if (mode === 'edit' && editingId) {
-      const updated = courses.map(c => {
-        if (c.id === editingId) {
-          return {
-            ...c,
-            name: form.name,
-            description: form.description,
-            duration: form.duration,
-            deadline: form.deadline,
-            delivery: form.delivery,
-            daysSchedule: form.daysSchedule,
-            requirements: form.requirements,
-            cities: validCities,
-            days: validDays,
-            documentCategories: cleanedIDCategories,
-            qualificationCategories: cleanedQualCategories,
-          }
-        }
-        return c
-      })
-      setCourses(updated)
+      const existingCourse = courses.find(c => c.id === editingId)
+      if (existingCourse) {
+        updateCourse({
+          ...existingCourse,
+          name: form.name,
+          description: form.description,
+          duration: form.duration,
+          deadline: form.deadline,
+          delivery: form.delivery,
+          daysSchedule: form.daysSchedule,
+          requirements: form.requirements,
+          cities: validCities,
+          days: validDays,
+          documentCategories: cleanedIDCategories,
+          qualificationCategories: cleanedQualCategories,
+        })
+      }
     } else {
       const course: Course = {
         id: typeof window !== 'undefined' && window.crypto?.randomUUID ? window.crypto.randomUUID() : `c1000000-0000-4000-8000-${Date.now().toString(16).padStart(12, '0')}`,

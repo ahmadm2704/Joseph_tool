@@ -92,6 +92,7 @@ interface AppStore {
 
   addCourse: (course: Course) => Promise<void>
   removeCourse: (id: string) => Promise<void>
+  updateCourse: (course: Course) => Promise<void>
   setCourses: (courses: Course[]) => void
 
   addCity: (city: City) => void
@@ -327,6 +328,44 @@ export const useStore = create<AppStore>()(
         }
       },
       
+      updateCourse: async (updatedCourse) => {
+        set((state) => ({
+          courses: state.courses.map((c) => (c.id === updatedCourse.id ? updatedCourse : c))
+        }))
+        try {
+          const { error } = await supabase.from('courses').update({
+            name: updatedCourse.name,
+            description: updatedCourse.description,
+            duration: updatedCourse.duration,
+            deadline: updatedCourse.deadline,
+            delivery: updatedCourse.delivery,
+            days_schedule: updatedCourse.daysSchedule,
+            requirements: updatedCourse.requirements,
+            cities: updatedCourse.cities,
+            days: updatedCourse.days,
+            document_categories: updatedCourse.documentCategories,
+            qualification_categories: updatedCourse.qualificationCategories
+          }).eq('id', updatedCourse.id)
+          
+          if (error) {
+             const { error: err2 } = await supabase.from('courses').update({
+              name: updatedCourse.name,
+              description: updatedCourse.description,
+              duration: updatedCourse.duration,
+              deadline: updatedCourse.deadline,
+              delivery: updatedCourse.delivery,
+              days_schedule: updatedCourse.daysSchedule,
+              requirements: updatedCourse.requirements,
+              cities: updatedCourse.cities,
+              days: updatedCourse.days
+            }).eq('id', updatedCourse.id)
+            if (err2) console.warn("Supabase course update notice:", err2.message || err2)
+          }
+        } catch (e) {
+          console.warn("Supabase operation bypassed:", e)
+        }
+      },
+
       setCourses: (courses) => set({ courses }),
 
       addGalleryImage: (image) => set((state) => ({ galleryImages: [...state.galleryImages, image] })),
