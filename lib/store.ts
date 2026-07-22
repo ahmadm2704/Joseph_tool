@@ -446,20 +446,23 @@ export const useStore = create<AppStore>()(
           ])
 
           if (coursesRes.data) {
-            let currentCourses: Course[] = coursesRes.data.map(c => ({
-              id: c.id,
-              name: c.name,
-              description: c.description,
-              duration: c.duration,
-              deadline: c.deadline,
-              delivery: c.delivery,
-              daysSchedule: c.days_schedule,
-              requirements: c.requirements,
-              cities: c.cities || [],
-              days: c.days || [],
-              documentCategories: c.document_categories || undefined,
-              qualificationCategories: c.qualification_categories || undefined
-            }))
+            let currentCourses: Course[] = coursesRes.data.map(c => {
+              const existingCourse = get().courses.find(ec => ec.id === c.id)
+              return {
+                id: c.id,
+                name: c.name,
+                description: c.description,
+                duration: c.duration,
+                deadline: c.deadline,
+                delivery: c.delivery,
+                daysSchedule: c.days_schedule,
+                requirements: c.requirements,
+                cities: c.cities || [],
+                days: c.days || [],
+                documentCategories: c.document_categories ?? existingCourse?.documentCategories,
+                qualificationCategories: c.qualification_categories ?? existingCourse?.qualificationCategories
+              }
+            })
             
             // Check for missing initial courses and seed them
             const existingIds = new Set(currentCourses.map(c => c.id))

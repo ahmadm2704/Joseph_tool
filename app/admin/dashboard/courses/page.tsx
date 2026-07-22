@@ -159,8 +159,8 @@ export default function CoursesManagement() {
       requirements: course.requirements || '',
       cities: course.cities?.length ? course.cities.map(c => ({ name: c.name })) : [{ name: '' }],
       days: course.days?.length ? course.days.map(d => ({ name: d.name, date: d.date })) : [{ name: '', date: '' }],
-      documentCategories: course.documentCategories?.length ? course.documentCategories : defaultIDCategories,
-      qualificationCategories: course.qualificationCategories?.length ? course.qualificationCategories : defaultQualCategories,
+      documentCategories: course.documentCategories ? course.documentCategories : defaultIDCategories,
+      qualificationCategories: course.qualificationCategories ? course.qualificationCategories : defaultQualCategories,
     })
     setEditingId(course.id)
     setFormError('')

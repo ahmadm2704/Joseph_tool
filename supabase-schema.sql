@@ -19,6 +19,8 @@ CREATE TABLE courses (
     requirements TEXT,
     cities JSONB DEFAULT '[]'::jsonb,
     days JSONB DEFAULT '[]'::jsonb,
+    document_categories JSONB,
+    qualification_categories JSONB,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );
 

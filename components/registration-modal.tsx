@@ -320,7 +320,7 @@ export default function RegistrationModal({ isOpen, onClose, courses }: Registra
                   const selectedCourse = courses.find((c: Course) => c.id === formData.courseId)
                   
                   // Use course-specific custom document categories or fallback to default
-                  const activeCategories: { status: string; reqs: { name: string; required: boolean }[] }[] = selectedCourse?.documentCategories?.length
+                  const activeCategories: { status: string; reqs: { name: string; required: boolean }[] }[] = selectedCourse?.documentCategories
                     ? selectedCourse.documentCategories.map(c => ({
                         status: c.categoryName,
                         reqs: c.documents.map(d => ({ name: d.name, required: d.required }))
