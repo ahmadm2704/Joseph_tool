@@ -317,17 +317,27 @@ export default function RegistrationModal({ isOpen, onClose, courses }: Registra
                 )}
 
                 {step === 'documents' && (() => {
+                  const selectedCourse = courses.find((c: Course) => c.id === formData.courseId)
+                  
+                  // Use course-specific custom document categories or fallback to default
+                  const activeCategories: { status: string; reqs: { name: string; required: boolean }[] }[] = selectedCourse?.documentCategories?.length
+                    ? selectedCourse.documentCategories.map(c => ({
+                        status: c.categoryName,
+                        reqs: c.documents.map(d => ({ name: d.name, required: d.required }))
+                      }))
+                    : Object.entries(citizenshipRequirements).map(([status, reqs]) => ({ status, reqs }))
+
                   return (
                     <motion.div key="documents" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-5">
                       <div>
                         <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2 tracking-tight">
                           <FileText className="text-indigo-600" size={20} /> Required Documents
                         </h3>
-                        <p className="text-slate-600 text-sm mt-1">Please select your status to see required documents.</p>
+                        <p className="text-slate-600 text-sm mt-1">Please select your category/status to see required documents.</p>
                       </div>
 
                       <div className="space-y-4">
-                        {Object.entries(citizenshipRequirements).map(([status, reqs]) => (
+                        {activeCategories.map(({ status, reqs }) => (
                           <div key={status} className="flex flex-col">
                             <label className={`flex items-center gap-3 p-4 rounded-2xl border cursor-pointer transition-all ${formData.citizenshipStatus === status ? 'border-indigo-600 bg-indigo-50/70 shadow-md' : 'border-slate-200 bg-white hover:border-slate-300'}`}>
                               <input 
@@ -413,13 +423,15 @@ export default function RegistrationModal({ isOpen, onClose, courses }: Registra
 
                 {step === 'qualification' && (() => {
                   const selectedCourse = courses.find((c: Course) => c.id === formData.courseId)
+                  const qualCats = selectedCourse?.qualificationCategories || []
+
                   return (
                     <motion.div key="qualification" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-5">
                       <div>
                         <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2 tracking-tight">
                           <FileText className="text-indigo-600" size={20} /> Upload Qualifications
                         </h3>
-                        <p className="text-slate-600 text-sm mt-1">Please upload the required qualifications to support your application.</p>
+                        <p className="text-slate-600 text-sm mt-1">Please select your entry pathway and upload required qualification documents.</p>
                       </div>
 
                       {/* Entry Requirements Banner */}
@@ -430,19 +442,35 @@ export default function RegistrationModal({ isOpen, onClose, courses }: Registra
                               <Layers size={16} className="text-amber-800" />
                             </div>
                             <div>
-                              <p className="text-xs font-bold uppercase tracking-wider text-amber-800 mb-0.5">Entry Requirements for this course</p>
+                              <p className="text-xs font-bold uppercase tracking-wider text-amber-800 mb-0.5">Entry Requirements Summary</p>
                               <p className="text-sm text-amber-950 font-bold">{selectedCourse.requirements}</p>
-                              {selectedCourse.qualificationTypes && selectedCourse.qualificationTypes.length > 0 && (
-                                <div className="flex flex-wrap gap-1.5 mt-2">
-                                  {selectedCourse.qualificationTypes.map(q => (
-                                    <span key={q} className="px-2 py-0.5 rounded bg-amber-200/80 text-amber-900 font-bold text-[0.65rem]">
-                                      ✓ {q}
-                                    </span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Qualification Categories / Pathways */}
+                      {qualCats.length > 0 && (
+                        <div className="space-y-3">
+                          <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Select Qualification Pathway:</p>
+                          <div className="grid gap-3">
+                            {qualCats.map(cat => (
+                              <div key={cat.id} className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2">
+                                <h4 className="font-bold text-slate-900 text-sm flex items-center gap-2">
+                                  <span className="w-2 h-2 rounded-full bg-purple-600" /> {cat.categoryName}
+                                </h4>
+                                <div className="space-y-1.5 pl-4">
+                                  {cat.documents.map(doc => (
+                                    <div key={doc.id} className="flex items-center justify-between text-xs py-1 border-b border-slate-200/60 last:border-0">
+                                      <span className="font-medium text-slate-800">{doc.name}</span>
+                                      <span className={`text-[0.65rem] font-bold px-2 py-0.5 rounded uppercase ${doc.required ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-900'}`}>
+                                        {doc.required ? 'Compulsory' : 'Optional'}
+                                      </span>
+                                    </div>
                                   ))}
                                 </div>
-                              )}
-                              <p className="text-xs text-amber-800 mt-1 font-medium">Please upload documents that verify you meet these requirements.</p>
-                            </div>
+                              </div>
+                            ))}
                           </div>
                         </div>
                       )}

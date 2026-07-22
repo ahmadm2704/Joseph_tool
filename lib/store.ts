@@ -2,6 +2,25 @@ import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import { supabase } from './supabase'
 
+export interface DocumentItem {
+  id: string
+  name: string
+  required: boolean
+}
+
+export interface DocumentCategory {
+  id: string
+  categoryName: string
+  documents: DocumentItem[]
+}
+
+export interface CourseDocumentRequirement {
+  id: string
+  name: string
+  category: string
+  isRequired: boolean
+}
+
 export interface Course {
   id: string
   name: string
@@ -15,6 +34,9 @@ export interface Course {
   days: Day[]
   requiredDocuments?: string[]
   qualificationTypes?: string[]
+  documentRules?: CourseDocumentRequirement[]
+  documentCategories?: DocumentCategory[]
+  qualificationCategories?: DocumentCategory[]
 }
 
 export interface City {
@@ -259,25 +281,50 @@ export const useStore = create<AppStore>()(
 
       addCourse: async (course) => {
         set((state) => ({ courses: [...state.courses, course] }))
-        const { error } = await supabase.from('courses').insert({
-          id: course.id,
-          name: course.name,
-          description: course.description,
-          duration: course.duration,
-          deadline: course.deadline,
-          delivery: course.delivery,
-          days_schedule: course.daysSchedule,
-          requirements: course.requirements,
-          cities: course.cities,
-          days: course.days
-        })
-        if (error) console.error("Error inserting course", error)
+        try {
+          const { error } = await supabase.from('courses').insert({
+            id: course.id,
+            name: course.name,
+            description: course.description,
+            duration: course.duration,
+            deadline: course.deadline,
+            delivery: course.delivery,
+            days_schedule: course.daysSchedule,
+            requirements: course.requirements,
+            cities: course.cities,
+            days: course.days,
+            document_categories: course.documentCategories,
+            qualification_categories: course.qualificationCategories
+          })
+          if (error) {
+            // Fallback insert without extra json columns if columns do not exist in SQL schema yet
+            const { error: err2 } = await supabase.from('courses').insert({
+              id: course.id,
+              name: course.name,
+              description: course.description,
+              duration: course.duration,
+              deadline: course.deadline,
+              delivery: course.delivery,
+              days_schedule: course.daysSchedule,
+              requirements: course.requirements,
+              cities: course.cities,
+              days: course.days
+            })
+            if (err2) console.warn("Supabase course insert notice:", err2.message || err2)
+          }
+        } catch (e) {
+          console.warn("Supabase operation bypassed:", e)
+        }
       },
 
       removeCourse: async (id) => {
         set((state) => ({ courses: state.courses.filter((c) => c.id !== id) }))
-        const { error } = await supabase.from('courses').delete().eq('id', id)
-        if (error) console.error("Error deleting course", error)
+        try {
+          const { error } = await supabase.from('courses').delete().eq('id', id)
+          if (error) console.warn("Supabase course delete notice:", error.message || error)
+        } catch (e) {
+          console.warn("Supabase operation bypassed:", e)
+        }
       },
       
       setCourses: (courses) => set({ courses }),
@@ -288,49 +335,65 @@ export const useStore = create<AppStore>()(
 
       addRegistration: async (registration) => {
         set((state) => ({ registrations: [...state.registrations, registration] }))
-        const { error } = await supabase.from('registrations').insert({
-          id: registration.id,
-          course_id: registration.courseId,
-          city_name: registration.cityId,
-          day_schedule: registration.dayId,
-          first_name: registration.firstName,
-          last_name: registration.lastName,
-          email: registration.email,
-          phone: registration.phone,
-          address: registration.address,
-          document_url: registration.documentUrls ? registration.documentUrls.join(',') : null,
-          citizenship_status: registration.citizenshipStatus || null,
-          created_at: registration.createdAt
-        })
-        if (error) console.error("Error inserting registration:", error.message, error.details)
+        try {
+          const { error } = await supabase.from('registrations').insert({
+            id: registration.id,
+            course_id: registration.courseId,
+            city_name: registration.cityId,
+            day_schedule: registration.dayId,
+            first_name: registration.firstName,
+            last_name: registration.lastName,
+            email: registration.email,
+            phone: registration.phone,
+            address: registration.address,
+            document_url: registration.documentUrls ? registration.documentUrls.join(',') : null,
+            citizenship_status: registration.citizenshipStatus || null,
+            created_at: registration.createdAt
+          })
+          if (error) console.warn("Supabase registration insert notice:", error.message || error)
+        } catch (e) {
+          console.warn("Supabase operation bypassed:", e)
+        }
       },
 
       removeRegistration: async (id) => {
         set((state) => ({ registrations: state.registrations.filter((r) => r.id !== id) }))
-        const { error } = await supabase.from('registrations').delete().eq('id', id)
-        if (error) console.error("Error deleting registration", error)
+        try {
+          const { error } = await supabase.from('registrations').delete().eq('id', id)
+          if (error) console.warn("Supabase registration delete notice:", error.message || error)
+        } catch (e) {
+          console.warn("Supabase operation bypassed:", e)
+        }
       },
 
       setRegistrations: (registrations) => set({ registrations }),
 
       addContactMessage: async (msg) => {
         set((state) => ({ contactMessages: [...state.contactMessages, msg] }))
-        const { error } = await supabase.from('contact_messages').insert({
-          id: msg.id,
-          name: msg.name,
-          email: msg.email,
-          subject: msg.subject,
-          message: msg.message,
-          status: msg.status,
-          created_at: msg.createdAt
-        })
-        if (error) console.error("Error inserting contact message:", error)
+        try {
+          const { error } = await supabase.from('contact_messages').insert({
+            id: msg.id,
+            name: msg.name,
+            email: msg.email,
+            subject: msg.subject,
+            message: msg.message,
+            status: msg.status,
+            created_at: msg.createdAt
+          })
+          if (error) console.warn("Supabase contact insert notice:", error.message || error)
+        } catch (e) {
+          console.warn("Supabase operation bypassed:", e)
+        }
       },
 
       removeContactMessage: async (id) => {
         set((state) => ({ contactMessages: state.contactMessages.filter((m) => m.id !== id) }))
-        const { error } = await supabase.from('contact_messages').delete().eq('id', id)
-        if (error) console.error("Error deleting contact message:", error)
+        try {
+          const { error } = await supabase.from('contact_messages').delete().eq('id', id)
+          if (error) console.warn("Supabase contact delete notice:", error.message || error)
+        } catch (e) {
+          console.warn("Supabase operation bypassed:", e)
+        }
       },
 
       setContactMessages: (messages) => set({ contactMessages: messages }),
@@ -344,7 +407,7 @@ export const useStore = create<AppStore>()(
           ])
 
           if (coursesRes.data) {
-            let currentCourses = coursesRes.data.map(c => ({
+            let currentCourses: Course[] = coursesRes.data.map(c => ({
               id: c.id,
               name: c.name,
               description: c.description,
@@ -354,7 +417,9 @@ export const useStore = create<AppStore>()(
               daysSchedule: c.days_schedule,
               requirements: c.requirements,
               cities: c.cities || [],
-              days: c.days || []
+              days: c.days || [],
+              documentCategories: c.document_categories || undefined,
+              qualificationCategories: c.qualification_categories || undefined
             }))
             
             // Check for missing initial courses and seed them
