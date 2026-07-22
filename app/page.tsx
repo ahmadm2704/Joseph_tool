@@ -8,10 +8,10 @@ import Link from 'next/link'
 import Navbar from '@/components/navbar'
 import AnimatedBanner from '@/components/animated-banner'
 import GalleryCarousel from '@/components/gallery-carousel'
-import RegistrationModal from '@/components/registration-modal'
 import ParticleField from '@/components/particle-field'
 import SpotlightCursor from '@/components/spotlight-cursor'
 import Footer from '@/components/footer'
+import ThreeCanvas from '@/components/three-canvas'
 import { useStore } from '@/lib/store'
 
 /* ─── Animated Counter ─── */
@@ -59,14 +59,14 @@ function SectionHeader({ badge, badgeIcon: BadgeIcon, title, highlight, subtitle
       transition={{ duration: 0.7 }}
       className="text-center mb-20"
     >
-      <span className="inline-flex items-center gap-2 glass px-5 py-2.5 rounded-full mb-6 text-xs text-purple-300 font-semibold tracking-widest uppercase">
+      <span className="inline-flex items-center gap-2 glass px-5 py-2.5 rounded-full mb-6 text-xs text-indigo-600 font-bold tracking-widest uppercase">
         <BadgeIcon size={13} />
         {badge}
       </span>
-      <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-5 tracking-tight leading-tight">
+      <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-5 tracking-tight leading-tight">
         {title} <span className="gradient-text">{highlight}</span>
       </h2>
-      <p className="text-gray-500 max-w-2xl mx-auto text-lg leading-relaxed">{subtitle}</p>
+      <p className="text-slate-600 max-w-2xl mx-auto text-lg leading-relaxed">{subtitle}</p>
     </motion.div>
   )
 }
@@ -75,11 +75,10 @@ export default function Home() {
   const [isRegistrationOpen, setIsRegistrationOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
   const { courses } = useStore()
-  const heroRef = useRef(null)
-  const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] })
-  const heroY = useTransform(scrollYProgress, [0, 1], [0, -200])
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 0])
-  const heroScale = useTransform(scrollYProgress, [0, 1], [1, 0.95])
+  const { scrollYProgress } = useScroll()
+  const heroY = useTransform(scrollYProgress, [0, 0.4], [0, -120])
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0])
+  const heroScale = useTransform(scrollYProgress, [0, 0.4], [1, 0.96])
 
   useEffect(() => {
     setMounted(true)
@@ -124,7 +123,7 @@ export default function Home() {
   const logos = ['Google', 'Microsoft', 'Amazon', 'Meta', 'Apple', 'Netflix', 'Spotify', 'Stripe']
 
   return (
-    <main className="min-h-screen bg-[#050510] relative">
+    <main className="min-h-screen bg-[#f8fafc] relative text-[#0f172a]">
 
       <div className="relative z-10">
         <Navbar />
@@ -133,7 +132,7 @@ export default function Home() {
         {/* ════════════════════════════════════════
             HERO
             ════════════════════════════════════════ */}
-        <section ref={heroRef} className="relative min-h-[95vh] flex items-center overflow-hidden aurora-bg">
+        <section className="relative min-h-[95vh] flex items-center overflow-hidden aurora-bg">
           <div className="absolute inset-0 grid-pattern" />
 
           <motion.div
@@ -149,8 +148,8 @@ export default function Home() {
                   transition={{ duration: 0.7, delay: 0.3 }}
                   className="inline-flex items-center gap-2 glass px-5 py-2.5 rounded-full mb-10"
                 >
-                  <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                  <span className="text-xs font-semibold text-gray-300 tracking-widest uppercase">Now Enrolling — Class of 2024</span>
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="text-xs font-bold text-indigo-600 tracking-widest uppercase">Now Enrolling — Class of 2024</span>
                 </motion.div>
 
                 <motion.h1
@@ -159,18 +158,18 @@ export default function Home() {
                   transition={{ duration: 0.8, delay: 0.4 }}
                   className="text-5xl md:text-6xl lg:text-[4.5rem] font-bold leading-[1.05] mb-8 tracking-tight"
                 >
-                  <span className="text-white">Master Your</span>
+                  <span className="text-slate-900">Master Your</span>
                   <br />
                   <span className="gradient-text">Professional</span>
                   <br />
-                  <span className="text-white">Craft.</span>
+                  <span className="text-slate-900">Craft.</span>
                 </motion.h1>
 
                 <motion.p
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.7, delay: 0.55 }}
-                  className="text-lg text-gray-400 mb-12 max-w-lg leading-relaxed"
+                  className="text-lg text-slate-600 mb-12 max-w-lg leading-relaxed"
                 >
                   Transform your career with world-class courses taught by industry veterans. Practical projects, lifetime mentorship, and a global community of ambitious professionals.
                 </motion.p>
@@ -204,11 +203,11 @@ export default function Home() {
                 >
                   <div className="flex -space-x-3">
                     {['/avatar-1.png', '/avatar-2.png', '/avatar-3.png'].map((src, i) => (
-                      <div key={i} className="relative w-11 h-11 rounded-full border-2 border-[#050510] overflow-hidden">
+                      <div key={i} className="relative w-11 h-11 rounded-full border-2 border-white overflow-hidden">
                         <Image src={src} alt="Student" fill className="object-cover" />
                       </div>
                     ))}
-                    <div className="w-11 h-11 rounded-full border-2 border-[#050510] bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center text-white text-xs font-bold">
+                    <div className="w-11 h-11 rounded-full border-2 border-white bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center text-white text-xs font-bold">
                       +15K
                     </div>
                   </div>
@@ -217,14 +216,14 @@ export default function Home() {
                       {[...Array(5)].map((_, i) => (
                         <Star key={i} size={13} className="text-amber-400 fill-amber-400" />
                       ))}
-                      <span className="text-xs text-gray-500 ml-1.5 font-semibold">4.9/5</span>
+                      <span className="text-xs text-slate-500 ml-1.5 font-semibold">4.9/5</span>
                     </div>
-                    <p className="text-xs text-gray-600">from <span className="text-gray-400 font-semibold">15,000+</span> verified reviews</p>
+                    <p className="text-xs text-slate-500">from <span className="text-slate-600 font-semibold">15,000+</span> verified reviews</p>
                   </div>
                 </motion.div>
               </div>
 
-              {/* Right — 3D Hero */}
+              {/* Right — 3D Interactive WebGL Hero */}
               <motion.div
                 initial={{ opacity: 0, scale: 0.85, rotateY: -10 }}
                 animate={{ opacity: 1, scale: 1, rotateY: 0 }}
@@ -232,19 +231,11 @@ export default function Home() {
                 className="relative hidden lg:block"
               >
                 <div className="relative perspective-container">
-                  {/* Ambient glow behind image */}
-                  <div className="absolute -inset-10 bg-gradient-to-br from-purple-600/15 via-transparent to-cyan-600/10 blur-3xl rounded-full" />
+                  <div className="absolute -inset-10 bg-gradient-to-br from-indigo-500/15 via-transparent to-cyan-500/15 blur-3xl rounded-full" />
 
                   <div className="relative rounded-3xl overflow-hidden animated-border float-3d" style={{ transformStyle: 'preserve-3d' }}>
-                    <div className="glass-card-static p-2">
-                      <Image
-                        src="/hero-3d.png"
-                        alt="3D Crystalline graduation concept"
-                        width={560}
-                        height={480}
-                        className="w-full h-auto rounded-2xl"
-                        priority
-                      />
+                    <div className="glass-card-static p-4">
+                      <ThreeCanvas />
                     </div>
                   </div>
 
@@ -252,15 +243,15 @@ export default function Home() {
                   <motion.div
                     animate={{ y: [-12, 12, -12] }}
                     transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-                    className="absolute -left-8 top-[20%] glass-card-static p-4 !rounded-2xl shadow-2xl shadow-purple-900/20 glow-purple"
+                    className="absolute -left-8 top-[20%] glass-card-static p-4 !rounded-2xl shadow-xl shadow-indigo-500/10 glow-purple"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-green-500/25">
+                      <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/25">
                         <Users size={18} className="text-white" />
                       </div>
                       <div>
-                        <p className="text-[0.65rem] text-gray-500 font-medium uppercase tracking-wider">Active Students</p>
-                        <p className="text-xl font-bold text-white">15,234</p>
+                        <p className="text-[0.65rem] text-slate-500 font-semibold uppercase tracking-wider">Active Students</p>
+                        <p className="text-xl font-bold text-slate-900">15,234</p>
                       </div>
                     </div>
                   </motion.div>
@@ -268,15 +259,15 @@ export default function Home() {
                   <motion.div
                     animate={{ y: [12, -12, 12] }}
                     transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 1.5 }}
-                    className="absolute -right-6 bottom-[25%] glass-card-static p-4 !rounded-2xl shadow-2xl shadow-cyan-900/20 glow-cyan"
+                    className="absolute -right-6 bottom-[25%] glass-card-static p-4 !rounded-2xl shadow-xl shadow-cyan-500/10 glow-cyan"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-purple-500 to-violet-600 flex items-center justify-center shadow-lg shadow-purple-500/25">
+                      <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/25">
                         <Award size={18} className="text-white" />
                       </div>
                       <div>
-                        <p className="text-[0.65rem] text-gray-500 font-medium uppercase tracking-wider">Success Rate</p>
-                        <p className="text-xl font-bold text-white">98.7%</p>
+                        <p className="text-[0.65rem] text-slate-500 font-semibold uppercase tracking-wider">Success Rate</p>
+                        <p className="text-xl font-bold text-slate-900">98.7%</p>
                       </div>
                     </div>
                   </motion.div>
@@ -289,16 +280,16 @@ export default function Home() {
         {/* ════════════════════════════════════════
             TRUSTED BY — LOGO MARQUEE
             ════════════════════════════════════════ */}
-        <section className="relative py-12 border-y border-white/[0.03] overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-[#050510] via-transparent to-[#050510] z-10 pointer-events-none" />
+        <section className="relative py-12 border-y border-slate-200 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-[#f8fafc] via-transparent to-[#f8fafc] z-10 pointer-events-none" />
           <div className="flex items-center">
             <div className="marquee-track flex items-center gap-16 whitespace-nowrap">
               {[...logos, ...logos].map((logo, i) => (
-                <span key={i} className="text-lg font-bold text-gray-700/50 tracking-widest uppercase select-none">{logo}</span>
+                <span key={i} className="text-lg font-bold text-slate-400 tracking-widest uppercase select-none">{logo}</span>
               ))}
             </div>
           </div>
-          <p className="text-center text-[0.65rem] text-gray-700 uppercase tracking-[0.3em] font-medium mt-6">Our graduates work at top companies worldwide</p>
+          <p className="text-center text-[0.65rem] text-slate-500 uppercase tracking-[0.3em] font-medium mt-6">Our graduates work at top companies worldwide</p>
         </section>
 
         {/* ════════════════════════════════════════
@@ -319,13 +310,13 @@ export default function Home() {
                     transition={{ delay: i * 0.12, duration: 0.6 }}
                     className="text-center group"
                   >
-                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500/10 to-cyan-500/10 border border-white/5 flex items-center justify-center mx-auto mb-5 group-hover:border-purple-500/20 transition-colors">
-                      <Icon size={22} className="text-purple-400" />
+                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500/10 to-cyan-500/10 border border-slate-200 flex items-center justify-center mx-auto mb-5 group-hover:border-indigo-500/20 transition-colors">
+                      <Icon size={22} className="text-indigo-500" />
                     </div>
                     <div className="text-4xl md:text-5xl font-bold gradient-text mb-2">
                       <AnimatedCounter target={stat.value} suffix={stat.suffix} />
                     </div>
-                    <p className="text-sm text-gray-600 font-medium">{stat.label}</p>
+                    <p className="text-sm text-slate-600 font-medium">{stat.label}</p>
                   </motion.div>
                 )
               })}
@@ -364,14 +355,14 @@ export default function Home() {
                         <Icon size={24} className="text-white" />
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <Star size={13} className="text-amber-400 fill-amber-400" />
-                        <span className="text-amber-400 font-bold text-sm">{course.rating}</span>
+                        <Star size={13} className="text-amber-500 fill-amber-500" />
+                        <span className="text-amber-600 font-bold text-sm">{course.rating}</span>
                       </div>
                     </div>
 
                     {/* Content */}
-                    <h3 className="text-xl font-bold text-white mb-2 group-hover:text-purple-300 transition-colors duration-300">{course.title}</h3>
-                    <p className="text-sm text-gray-500 mb-5 leading-relaxed">Master the latest technologies and frameworks with real-world projects and expert mentorship.</p>
+                    <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-indigo-600 transition-colors duration-300">{course.title}</h3>
+                    <p className="text-sm text-slate-600 mb-5 leading-relaxed">Master the latest technologies and frameworks with real-world projects and expert mentorship.</p>
 
                     {/* Tags */}
                     <div className="flex flex-wrap gap-2 mb-6">
@@ -381,11 +372,11 @@ export default function Home() {
                     </div>
 
                     {/* Footer */}
-                    <div className="flex items-center justify-between pt-5 border-t border-white/5">
+                    <div className="flex items-center justify-between pt-5 border-t border-slate-100">
                       <div>
                         <span className="text-3xl font-bold gradient-text">{course.price}</span>
                       </div>
-                      <div className="flex items-center gap-2 text-xs text-gray-600">
+                      <div className="flex items-center gap-2 text-xs text-slate-500">
                         <Users size={12} />
                         <span>{course.students} enrolled</span>
                       </div>
@@ -457,8 +448,8 @@ export default function Home() {
                     <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${f.color} flex items-center justify-center mb-6 shadow-xl ${f.shadow} group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500`}>
                       <Icon size={24} className="text-white" />
                     </div>
-                    <h3 className="text-lg font-bold text-white mb-3 group-hover:text-purple-300 transition-colors">{f.title}</h3>
-                    <p className="text-sm text-gray-500 leading-relaxed">{f.description}</p>
+                    <h3 className="text-lg font-bold text-slate-900 mb-3 group-hover:text-indigo-600 transition-colors">{f.title}</h3>
+                    <p className="text-sm text-slate-600 leading-relaxed">{f.description}</p>
                   </motion.div>
                 )
               })}
@@ -502,18 +493,18 @@ export default function Home() {
                   </div>
 
                   {/* Quote */}
-                  <p className="text-gray-300 text-sm leading-relaxed mb-8 relative z-10">
+                  <p className="text-slate-700 text-sm leading-relaxed mb-8 relative z-10">
                     &ldquo;{t.text}&rdquo;
                   </p>
 
                   {/* Author */}
-                  <div className="flex items-center gap-4 pt-6 border-t border-white/5">
-                    <div className="relative w-12 h-12 rounded-xl overflow-hidden border border-white/10">
+                  <div className="flex items-center gap-4 pt-6 border-t border-slate-100">
+                    <div className="relative w-12 h-12 rounded-xl overflow-hidden border border-slate-200">
                       <Image src={t.avatar} alt={t.name} fill className="object-cover" />
                     </div>
                     <div>
-                      <p className="font-bold text-white text-sm">{t.name}</p>
-                      <p className="text-xs text-gray-500">{t.role}</p>
+                      <p className="font-bold text-slate-900 text-sm">{t.name}</p>
+                      <p className="text-xs text-slate-500">{t.role}</p>
                     </div>
                   </div>
                 </motion.div>
@@ -535,17 +526,17 @@ export default function Home() {
               viewport={{ once: true }}
               transition={{ duration: 0.7 }}
             >
-              <span className="inline-flex items-center gap-2 glass px-5 py-2.5 rounded-full mb-10 text-xs text-purple-300 font-semibold tracking-widest uppercase">
+              <span className="inline-flex items-center gap-2 glass px-5 py-2.5 rounded-full mb-10 text-xs text-indigo-600 font-bold tracking-widest uppercase">
                 <Globe size={13} />
                 Join 15,000+ Professionals
               </span>
 
-              <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-8 leading-tight tracking-tight">
+              <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-slate-900 mb-8 leading-tight tracking-tight">
                 Ready to
                 <br />
                 <span className="gradient-text">Transform</span> Your Career?
               </h2>
-              <p className="text-xl text-gray-400 mb-12 max-w-2xl mx-auto leading-relaxed">
+              <p className="text-xl text-slate-600 mb-12 max-w-2xl mx-auto leading-relaxed">
                 Join the next generation of tech professionals. Your future starts with a single step.
               </p>
 
@@ -565,7 +556,7 @@ export default function Home() {
               </div>
 
               {/* Trust */}
-              <p className="mt-10 text-xs text-gray-600">
+              <p className="mt-10 text-xs text-slate-500">
                 ✦ No credit card required · 30-day money-back guarantee · Cancel anytime
               </p>
             </motion.div>
@@ -573,12 +564,6 @@ export default function Home() {
         </section>
 
         <Footer />
-
-        <RegistrationModal
-          isOpen={isRegistrationOpen}
-          onClose={() => setIsRegistrationOpen(false)}
-          courses={courses}
-        />
       </div>
     </main>
   )

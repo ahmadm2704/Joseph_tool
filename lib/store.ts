@@ -13,6 +13,8 @@ export interface Course {
   requirements: string
   cities: City[]
   days: Day[]
+  requiredDocuments?: string[]
+  qualificationTypes?: string[]
 }
 
 export interface City {
@@ -48,10 +50,21 @@ export interface StudentRegistration {
   createdAt: string
 }
 
+export interface ContactMessage {
+  id: string
+  name: string
+  email: string
+  subject: string
+  message: string
+  status: 'unread' | 'read' | 'replied'
+  createdAt: string
+}
+
 interface AppStore {
   courses: Course[]
   galleryImages: GalleryImage[]
   registrations: StudentRegistration[]
+  contactMessages: ContactMessage[]
 
   addCourse: (course: Course) => Promise<void>
   removeCourse: (id: string) => Promise<void>
@@ -64,6 +77,10 @@ interface AppStore {
   addRegistration: (registration: StudentRegistration) => Promise<void>
   removeRegistration: (id: string) => Promise<void>
   setRegistrations: (registrations: StudentRegistration[]) => void
+
+  addContactMessage: (msg: ContactMessage) => Promise<void>
+  removeContactMessage: (id: string) => Promise<void>
+  setContactMessages: (messages: ContactMessage[]) => void
 
   syncData: () => Promise<void>
 }
@@ -210,6 +227,7 @@ export const useStore = create<AppStore>()(
       courses: initialCourses,
       galleryImages: [],
       registrations: [],
+      contactMessages: [],
 
       addCourse: async (course) => {
         set((state) => ({ courses: [...state.courses, course] }))
@@ -267,11 +285,34 @@ export const useStore = create<AppStore>()(
 
       setRegistrations: (registrations) => set({ registrations }),
 
+      addContactMessage: async (msg) => {
+        set((state) => ({ contactMessages: [...state.contactMessages, msg] }))
+        const { error } = await supabase.from('contact_messages').insert({
+          id: msg.id,
+          name: msg.name,
+          email: msg.email,
+          subject: msg.subject,
+          message: msg.message,
+          status: msg.status,
+          created_at: msg.createdAt
+        })
+        if (error) console.error("Error inserting contact message:", error)
+      },
+
+      removeContactMessage: async (id) => {
+        set((state) => ({ contactMessages: state.contactMessages.filter((m) => m.id !== id) }))
+        const { error } = await supabase.from('contact_messages').delete().eq('id', id)
+        if (error) console.error("Error deleting contact message:", error)
+      },
+
+      setContactMessages: (messages) => set({ contactMessages: messages }),
+
       syncData: async () => {
         try {
-          const [coursesRes, regRes] = await Promise.all([
+          const [coursesRes, regRes, msgRes] = await Promise.all([
             supabase.from('courses').select('*'),
-            supabase.from('registrations').select('*')
+            supabase.from('registrations').select('*'),
+            supabase.from('contact_messages').select('*')
           ])
 
           if (coursesRes.data) {
@@ -336,6 +377,19 @@ export const useStore = create<AppStore>()(
               createdAt: r.created_at
             }))
             set({ registrations: mappedRegs })
+          }
+
+          if (msgRes.data) {
+            const mappedMsgs = msgRes.data.map(m => ({
+              id: m.id,
+              name: m.name,
+              email: m.email,
+              subject: m.subject || '',
+              message: m.message,
+              status: m.status || 'unread',
+              createdAt: m.created_at
+            }))
+            set({ contactMessages: mappedMsgs })
           }
         } catch (error) {
           console.error("Error syncing with Supabase", error)

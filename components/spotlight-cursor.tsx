@@ -6,14 +6,22 @@ export default function SpotlightCursor() {
   const spotlightRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    let ticking = false
+
     const handleMouseMove = (e: MouseEvent) => {
-      if (spotlightRef.current) {
-        spotlightRef.current.style.setProperty('--x', `${e.clientX}px`)
-        spotlightRef.current.style.setProperty('--y', `${e.clientY}px`)
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          if (spotlightRef.current) {
+            spotlightRef.current.style.setProperty('--x', `${e.clientX}px`)
+            spotlightRef.current.style.setProperty('--y', `${e.clientY}px`)
+          }
+          ticking = false
+        })
+        ticking = true
       }
     }
 
-    window.addEventListener('mousemove', handleMouseMove)
+    window.addEventListener('mousemove', handleMouseMove, { passive: true })
     return () => window.removeEventListener('mousemove', handleMouseMove)
   }, [])
 

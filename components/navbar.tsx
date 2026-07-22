@@ -70,10 +70,10 @@ export default function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`relative px-5 py-2.5 rounded-xl text-[0.82rem] font-semibold tracking-wide transition-all duration-300 ${
+                className={`relative px-5 py-2.5 rounded-xl text-[0.82rem] font-bold tracking-wide transition-all duration-300 ${
                   isActive(link.href)
-                    ? 'text-white'
-                    : 'text-gray-500 hover:text-gray-200'
+                    ? 'text-indigo-600'
+                    : 'text-slate-600 hover:text-indigo-600'
                 }`}
               >
                 {isActive(link.href) && (
@@ -82,7 +82,7 @@ export default function Navbar() {
                     className="absolute inset-0 rounded-xl overflow-hidden"
                     transition={{ type: 'spring', stiffness: 350, damping: 28 }}
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-purple-600/15 to-cyan-600/10 border border-purple-500/15 rounded-xl" />
+                    <div className="absolute inset-0 bg-indigo-50 border border-indigo-200/60 rounded-xl" />
                     <div className="absolute bottom-0 left-1/4 right-1/4 h-px bg-gradient-to-r from-transparent via-purple-400/50 to-transparent" />
                   </motion.div>
                 )}
@@ -109,7 +109,7 @@ export default function Navbar() {
           <div className="md:hidden">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="p-2.5 rounded-xl glass text-gray-400 hover:text-white transition-colors"
+              className="p-2.5 rounded-xl glass text-slate-600 hover:text-indigo-600 transition-colors"
             >
               {isOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
@@ -137,8 +137,8 @@ export default function Navbar() {
                       href={link.href}
                       className={`block px-5 py-3.5 rounded-xl text-sm font-semibold transition-all ${
                         isActive(link.href)
-                          ? 'bg-gradient-to-r from-purple-600/15 to-cyan-600/10 text-white border border-purple-500/15'
-                          : 'text-gray-500 hover:text-white hover:bg-white/3'
+                          ? 'bg-indigo-50 text-indigo-600 border border-indigo-200/60'
+                          : 'text-slate-600 hover:text-indigo-600 hover:bg-indigo-50/60'
                       }`}
                       onClick={() => setIsOpen(false)}
                     >

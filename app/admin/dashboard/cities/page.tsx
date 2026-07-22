@@ -72,44 +72,45 @@ export default function CitiesManagement() {
   if (!isAuthed) return null
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex min-h-screen bg-[#f8fafc] text-slate-900">
       <AdminSidebar onLogout={handleLogout} />
 
       <main className="flex-1 overflow-auto md:ml-64">
-        <div className="p-8">
+        <div className="p-8 max-w-7xl mx-auto">
           <div className="flex justify-between items-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">Manage Cities</h1>
+            <h1 className="text-3xl font-bold text-slate-900">Manage Cities</h1>
             <div className="flex gap-3">
               <button
                 onClick={handleExportCSV}
-                className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-colors"
+                className="flex items-center gap-2 btn-secondary !py-2.5 !px-5 text-sm font-bold shrink-0"
               >
-                <Download size={20} /> Export CSV
+                <Download size={16} /> Export CSV
               </button>
-              <label className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg transition-colors cursor-pointer">
+              <label className="flex items-center gap-2 btn-secondary !py-2.5 !px-5 text-sm font-bold shrink-0 cursor-pointer">
                 <span>Import CSV</span>
                 <input type="file" accept=".csv" onChange={handleImportCSV} className="hidden" />
               </label>
               <button
                 onClick={() => setIsAddingCity(!isAddingCity)}
-                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors"
+                className="flex items-center gap-2 btn-primary !py-2.5 !px-5 text-sm font-bold shrink-0"
               >
-                <Plus size={20} /> Add City
+                <Plus size={18} /> Add City
               </button>
             </div>
           </div>
 
           {/* Add City Form */}
           {isAddingCity && (
-            <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-              <h2 className="text-lg font-bold text-gray-900 mb-4">Add New City</h2>
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-md p-6 mb-8">
+              <h2 className="text-lg font-bold text-slate-900 mb-4">Add New City</h2>
               <div className="space-y-4">
                 <input
                   type="text"
                   placeholder="City Name"
                   value={newCityName}
                   onChange={(e) => setNewCityName(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-600"
+                  suppressHydrationWarning
+                  className="w-full px-4 py-2.5 bg-white border border-slate-300 text-slate-900 rounded-xl focus:outline-none focus:border-indigo-600 font-medium text-sm"
                 />
                 <div className="flex gap-3">
                   <button

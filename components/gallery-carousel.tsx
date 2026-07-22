@@ -32,7 +32,7 @@ export default function GalleryCarousel({ mainImage, groupImages }: GalleryCarou
       <div className="absolute -inset-4 bg-gradient-to-br from-purple-600/10 via-transparent to-cyan-600/10 blur-2xl rounded-3xl -z-10" />
 
       {/* Main Display */}
-      <div className="relative aspect-video w-full overflow-hidden rounded-3xl glass-card-static border border-white/10 shadow-2xl shadow-[#050510]/50 ring-1 ring-white/5">
+      <div className="relative aspect-video w-full overflow-hidden rounded-3xl glass-card-static border border-slate-200 shadow-2xl shadow-indigo-500/10 ring-1 ring-slate-200/50">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentIndex}
@@ -50,8 +50,8 @@ export default function GalleryCarousel({ mainImage, groupImages }: GalleryCarou
               priority
             />
             {/* Vignette overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#050510]/80 via-transparent to-[#050510]/20" />
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(5,5,16,0.4)_100%)]" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/10" />
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.15)_100%)]" />
           </motion.div>
         </AnimatePresence>
 
@@ -100,7 +100,7 @@ export default function GalleryCarousel({ mainImage, groupImages }: GalleryCarou
             onClick={() => { setCurrentIndex(i); setIsPlaying(false) }}
             className={`relative w-24 h-16 rounded-xl overflow-hidden transition-all duration-300 ${
               currentIndex === i
-                ? 'ring-2 ring-purple-500 ring-offset-2 ring-offset-[#050510] scale-110 shadow-lg shadow-purple-500/30'
+                ? 'ring-2 ring-indigo-500 ring-offset-2 ring-offset-[#f8fafc] scale-110 shadow-lg shadow-indigo-500/25'
                 : 'opacity-50 hover:opacity-100 filter grayscale-[50%]'
             }`}
           >

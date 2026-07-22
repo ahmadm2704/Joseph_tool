@@ -74,12 +74,7 @@ export default function RegistrationsManagement() {
   const selected = registrations.find(r => r.id === selectedReg)
 
   return (
-    <div className="flex min-h-screen bg-[#050510]">
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-600/10 blur-[120px] rounded-full" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-cyan-600/8 blur-[120px] rounded-full" />
-      </div>
-
+    <div className="flex min-h-screen bg-[#f8fafc] text-slate-900">
       <AdminSidebar onLogout={handleLogout} />
 
       <main className="flex-1 overflow-auto md:ml-64 relative z-10">
@@ -89,12 +84,12 @@ export default function RegistrationsManagement() {
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
             <div>
               <div className="flex items-center gap-2 mb-1.5">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-bold uppercase tracking-widest">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-50 border border-cyan-200 text-cyan-700 text-xs font-bold uppercase tracking-widest">
                   <Users size={11} /> Registrations
                 </span>
               </div>
-              <h1 className="text-3xl font-bold text-white tracking-tight">Student Registrations</h1>
-              <p className="text-gray-500 mt-1 text-sm">{registrations.length} total applications</p>
+              <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Student Registrations</h1>
+              <p className="text-slate-600 mt-1 text-sm">{registrations.length} total applications</p>
             </div>
             {registrations.length > 0 && (
               <button

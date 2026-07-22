@@ -49,13 +49,13 @@ export default function GalleryManagement() {
   if (!isAuthed) return null
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex min-h-screen bg-[#f8fafc] text-slate-900">
       <AdminSidebar onLogout={handleLogout} />
 
       <main className="flex-1 overflow-auto md:ml-64">
-        <div className="p-8">
+        <div className="p-8 max-w-7xl mx-auto">
           <div className="flex justify-between items-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">Manage Gallery</h1>
+            <h1 className="text-3xl font-bold text-slate-900">Manage Gallery</h1>
             <button
               onClick={() => setIsAddingImage(!isAddingImage)}
               className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors"
@@ -87,6 +87,7 @@ export default function GalleryManagement() {
                     placeholder="https://example.com/image.jpg"
                     value={imageUrl}
                     onChange={(e) => setImageUrl(e.target.value)}
+                    suppressHydrationWarning
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-600"
                   />
                   <p className="text-sm text-gray-500 mt-2">

@@ -22,8 +22,8 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  colorScheme: 'dark',
-  themeColor: '#0a0a1a',
+  colorScheme: 'light',
+  themeColor: '#f8fafc',
 }
 
 export default function RootLayout({
@@ -32,8 +32,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} bg-[#0a0a1a]`}>
-      <body className="antialiased font-[family-name:var(--font-inter)] noise-overlay">
+    <html lang="en" className={`${inter.variable} bg-[#f8fafc]`}>
+      <body className="antialiased font-[family-name:var(--font-inter)] text-[#0f172a]">
         <Providers>
           {children}
         </Providers>
