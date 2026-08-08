@@ -18,7 +18,7 @@ export default function ThreeCanvas() {
 
     const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: 'high-performance' })
     renderer.setSize(container.clientWidth, container.clientHeight)
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.25))
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5))
     container.appendChild(renderer.domElement)
 
     // Lighting
@@ -133,7 +133,7 @@ export default function ThreeCanvas() {
 
     // Ribbon Ring around Scroll
     const ribbonGeo = new THREE.CylinderGeometry(0.2, 0.2, 0.15, 32)
-    const ribbonMat = new THREE.MeshPhysicalMaterial({ color: 0xef4444, roughness: 0.3, metalness: 0.2 })
+    const ribbonMat = new THREE.MeshPhysicalMaterial({ color: 0xef4444, roughness: 0.3, metalness: 0.2, clearcoat: 0.4 })
     const ribbon = new THREE.Mesh(ribbonGeo, ribbonMat)
     ribbon.rotation.z = Math.PI / 2
     diplomaGroup.add(ribbon)

@@ -25,7 +25,7 @@ export default function ParticleField() {
       'rgba(236, 72, 153, 0.3)',
     ]
 
-    const count = Math.min(30, Math.floor(window.innerWidth / 40))
+    const count = Math.min(40, Math.floor(window.innerWidth / 40))
     const particles = Array.from({ length: count }, () => ({
       x: Math.random() * window.innerWidth,
       y: Math.random() * window.innerHeight,

@@ -69,6 +69,8 @@ export interface StudentRegistration {
   documentsAttached: boolean
   documentUrls?: string[]
   citizenshipStatus?: string
+  meetingDate?: string
+  meetingTime?: string
   createdAt: string
 }
 
@@ -82,6 +84,11 @@ export interface ContactMessage {
   createdAt: string
 }
 
+export interface MeetingDate {
+  date: string
+  slots: string[]
+}
+
 interface AppStore {
   courses: Course[]
   cities: City[]
@@ -89,6 +96,11 @@ interface AppStore {
   galleryImages: GalleryImage[]
   registrations: StudentRegistration[]
   contactMessages: ContactMessage[]
+  meetingSlots: string[]
+  meetingDates: MeetingDate[]
+
+  setMeetingSlots: (slots: string[]) => void
+  setMeetingDates: (dates: MeetingDate[]) => void
 
   addCourse: (course: Course) => Promise<void>
   removeCourse: (id: string) => Promise<void>
@@ -108,6 +120,7 @@ interface AppStore {
   setGalleryImages: (images: GalleryImage[]) => void
 
   addRegistration: (registration: StudentRegistration) => Promise<void>
+  updateRegistration: (id: string, updates: Partial<StudentRegistration>) => Promise<void>
   removeRegistration: (id: string) => Promise<void>
   setRegistrations: (registrations: StudentRegistration[]) => void
 
@@ -271,6 +284,11 @@ export const useStore = create<AppStore>()(
       galleryImages: [],
       registrations: [],
       contactMessages: [],
+      meetingSlots: ['09:00 AM', '10:00 AM', '11:00 AM', '02:00 PM', '03:00 PM', '04:00 PM'],
+      meetingDates: [], // By default, let's keep it empty, meaning the logic can fall back to generic dates if empty or we can force them to add some. We will handle this in UI.
+
+      setMeetingSlots: (slots) => set({ meetingSlots: slots }),
+      setMeetingDates: (dates) => set({ meetingDates: dates }),
 
       addCity: (city) => set((state) => ({ cities: [...state.cities, city] })),
       removeCity: (id) => set((state) => ({ cities: state.cities.filter((c) => c.id !== id) })),
@@ -377,7 +395,7 @@ export const useStore = create<AppStore>()(
         try {
           const { error } = await supabase.from('registrations').insert({
             id: registration.id,
-            course_id: registration.courseId,
+            course_id: registration.courseId === '00000000-0000-0000-0000-000000000000' ? null : registration.courseId,
             city_name: registration.cityId,
             day_schedule: registration.dayId,
             first_name: registration.firstName,
@@ -387,9 +405,28 @@ export const useStore = create<AppStore>()(
             address: registration.address,
             document_url: registration.documentUrls ? registration.documentUrls.join(',') : null,
             citizenship_status: registration.citizenshipStatus || null,
+            meeting_date: registration.meetingDate || null,
+            meeting_time: registration.meetingTime || null,
             created_at: registration.createdAt
           })
           if (error) console.warn("Supabase registration insert notice:", error.message || error)
+        } catch (e) {
+          console.warn("Supabase operation bypassed:", e)
+        }
+      },
+
+      updateRegistration: async (id, updates) => {
+        set((state) => ({
+          registrations: state.registrations.map(r => r.id === id ? { ...r, ...updates } : r)
+        }))
+        try {
+          const dbUpdates: any = {}
+          if (updates.meetingDate !== undefined) dbUpdates.meeting_date = updates.meetingDate
+          if (updates.meetingTime !== undefined) dbUpdates.meeting_time = updates.meetingTime
+          if (Object.keys(dbUpdates).length > 0) {
+            const { error } = await supabase.from('registrations').update(dbUpdates).eq('id', id)
+            if (error) console.warn("Supabase registration update notice:", error.message || error)
+          }
         } catch (e) {
           console.warn("Supabase operation bypassed:", e)
         }
@@ -498,7 +535,7 @@ export const useStore = create<AppStore>()(
           if (regRes.data) {
             const mappedRegs = regRes.data.map(r => ({
               id: r.id,
-              courseId: r.course_id,
+              courseId: r.course_id || '00000000-0000-0000-0000-000000000000',
               cityId: r.city_name || '',
               dayId: r.day_schedule || '',
               firstName: r.first_name,
@@ -509,6 +546,8 @@ export const useStore = create<AppStore>()(
               documentsAttached: !!r.document_url,
               documentUrls: r.document_url ? r.document_url.split(',') : [],
               citizenshipStatus: r.citizenship_status || '',
+              meetingDate: r.meeting_date || undefined,
+              meetingTime: r.meeting_time || undefined,
               createdAt: r.created_at
             }))
             set({ registrations: mappedRegs })

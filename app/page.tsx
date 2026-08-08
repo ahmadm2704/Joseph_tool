@@ -2,16 +2,20 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { motion, useScroll, useTransform, useInView } from 'framer-motion'
-import { Sparkles, GraduationCap, Users, Award, Globe, ArrowRight, Code, Smartphone, BrainCircuit, Cloud, Shield, BarChart3, Star, Zap, Target, Mail, Quote, ChevronRight, Play } from 'lucide-react'
+import { Sparkles, GraduationCap, Users, Award, Globe, ArrowRight, Code, Smartphone, BrainCircuit, Cloud, Shield, BarChart3, Star, Zap, Target, Mail, Quote, ChevronRight, Play, Calendar } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import Navbar from '@/components/navbar'
 import AnimatedBanner from '@/components/animated-banner'
 import GalleryCarousel from '@/components/gallery-carousel'
-import ParticleField from '@/components/particle-field'
-import SpotlightCursor from '@/components/spotlight-cursor'
+import dynamic from 'next/dynamic'
 import Footer from '@/components/footer'
-import ThreeCanvas from '@/components/three-canvas'
+import SpotlightCursor from '@/components/spotlight-cursor'
+
+const ThreeCanvas = dynamic(() => import('@/components/three-canvas'), { ssr: false })
+const ParticleField = dynamic(() => import('@/components/particle-field'), { ssr: false })
+import ScheduleMeetingModal from '@/components/schedule-meeting-modal'
+import RegistrationModal from '@/components/registration-modal'
 import { useStore } from '@/lib/store'
 
 /* ─── Animated Counter ─── */
@@ -73,6 +77,7 @@ function SectionHeader({ badge, badgeIcon: BadgeIcon, title, highlight, subtitle
 
 export default function Home() {
   const [isRegistrationOpen, setIsRegistrationOpen] = useState(false)
+  const [isScheduleOpen, setIsScheduleOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
   const { courses } = useStore()
   const { scrollYProgress } = useScroll()
@@ -185,12 +190,12 @@ export default function Home() {
                     className="btn-primary text-base flex items-center gap-3 group"
                     id="hero-register-btn"
                   >
-                    Start Learning
+                    Enroll Now
                     <ArrowRight size={18} className="group-hover:translate-x-1.5 transition-transform duration-300" />
                   </button>
-                  <button className="btn-secondary text-base flex items-center gap-3 group">
-                    <Play size={16} className="group-hover:scale-110 transition-transform" />
-                    Watch Demo
+                  <button onClick={() => setIsScheduleOpen(true)} className="btn-secondary text-base flex items-center gap-3 group">
+                    <Calendar size={16} className="text-indigo-600 group-hover:scale-110 transition-transform" />
+                    Schedule Meeting
                   </button>
                 </motion.div>
 
@@ -565,6 +570,9 @@ export default function Home() {
 
         <Footer />
       </div>
+      
+      <ScheduleMeetingModal isOpen={isScheduleOpen} onClose={() => setIsScheduleOpen(false)} />
+      <RegistrationModal isOpen={isRegistrationOpen} onClose={() => setIsRegistrationOpen(false)} courses={courses} />
     </main>
   )
 }

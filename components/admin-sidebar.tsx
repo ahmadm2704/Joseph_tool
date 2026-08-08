@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Menu, X, LayoutDashboard, BookOpen, Users, Image, LogOut, GraduationCap, ChevronRight, MessageSquare } from 'lucide-react'
+import { Menu, X, LayoutDashboard, BookOpen, Users, Image, LogOut, GraduationCap, ChevronRight, MessageSquare, Settings, Calendar } from 'lucide-react'
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
@@ -20,8 +20,10 @@ export default function AdminSidebar({ onLogout }: AdminSidebarProps) {
     { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard, color: 'text-indigo-600' },
     { href: '/admin/dashboard/courses', label: 'Manage Courses', icon: BookOpen, color: 'text-cyan-600' },
     { href: '/admin/dashboard/registrations', label: 'Registrations', icon: Users, color: 'text-pink-600' },
+    { href: '/admin/dashboard/meetings', label: 'General Meetings', icon: Calendar, color: 'text-violet-600' },
     { href: '/admin/dashboard/contact', label: 'Contact Messages', icon: MessageSquare, color: 'text-emerald-600' },
     { href: '/admin/dashboard/gallery', label: 'Gallery', icon: Image, color: 'text-amber-600' },
+    { href: '/admin/dashboard/settings', label: 'Settings', icon: Settings, color: 'text-slate-600' },
   ]
 
   const SidebarContent = () => (

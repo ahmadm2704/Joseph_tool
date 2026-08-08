@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, BookOpen, MapPin, Calendar, User, ChevronRight, CheckCircle2, Building, Mail, Phone, Map, FileText, UploadCloud, FileCheck, Sparkles, Star, Clock, AlertCircle, Layers, Wifi } from 'lucide-react'
+import { X, BookOpen, MapPin, Calendar, User, ChevronRight, CheckCircle2, Building, Mail, Phone, Map, FileText, UploadCloud, FileCheck, Sparkles, Star, Clock, AlertCircle, Layers, Wifi, Video } from 'lucide-react'
 import { useStore, Course, City, Day } from '@/lib/store'
 import { supabase } from '@/lib/supabase'
 
@@ -12,7 +12,7 @@ interface RegistrationModalProps {
   courses: Course[]
 }
 
-type FormStep = 'course' | 'city' | 'day' | 'documents' | 'qualification' | 'personal' | 'success'
+type FormStep = 'course' | 'city' | 'day' | 'documents' | 'qualification' | 'personal' | 'meeting' | 'success'
 
 interface FormData {
   courseId: string
@@ -26,6 +26,8 @@ interface FormData {
   citizenshipStatus: string
   citizenshipDocsAttached: boolean
   documentsAttached: boolean
+  meetingDate: string
+  meetingTime: string
 }
 
 const steps = [
@@ -39,13 +41,15 @@ const steps = [
 
 export default function RegistrationModal({ isOpen, onClose, courses }: RegistrationModalProps) {
   const [step, setStep] = useState<FormStep>('course')
-  const [formData, setFormData] = useState<FormData>({ courseId: '', cityId: '', dayId: '', firstName: '', lastName: '', email: '', phone: '', address: '', citizenshipStatus: '', citizenshipDocsAttached: false, documentsAttached: false })
+  const [formData, setFormData] = useState<FormData>({ courseId: '', cityId: '', dayId: '', firstName: '', lastName: '', email: '', phone: '', address: '', citizenshipStatus: '', citizenshipDocsAttached: false, documentsAttached: false, meetingDate: '', meetingTime: '' })
   const [focused, setFocused] = useState<string | null>(null)
   const [citizenshipFiles, setCitizenshipFiles] = useState<File[]>([])
   const [qualificationFiles, setQualificationFiles] = useState<File[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const { addRegistration } = useStore()
+  const [currentRegId, setCurrentRegId] = useState<string | null>(null)
+  const [isMeetingScheduled, setIsMeetingScheduled] = useState(false)
+  const { addRegistration, updateRegistration, meetingDates: storeMeetingDates, meetingSlots: storeMeetingSlots, registrations } = useStore()
 
   useEffect(() => {
     if (isOpen) {
@@ -59,7 +63,9 @@ export default function RegistrationModal({ isOpen, onClose, courses }: Registra
   const handleCourseSelect = (courseId: string) => { setFormData({ ...formData, courseId, cityId: '', dayId: '' }); setStep('city') }
   const handleCitySelect = (cityId: string) => { setFormData({ ...formData, cityId, dayId: '' }); setStep('day') }
   const handleDaySelect = (dayId: string) => { setFormData({ ...formData, dayId }); setStep('documents') }
-  const handlePersonalChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => { setFormData({ ...formData, [e.target.name]: e.target.value }) }
+  const handlePersonalChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value })
+  }
   const handleCitizenshipSkipOrNext = () => { setStep('qualification') }
   const handleDocumentSkipOrNext = () => { setStep('personal') }
   
@@ -111,7 +117,7 @@ export default function RegistrationModal({ isOpen, onClose, courses }: Registra
     } 
   }
 
-  const handleSubmit = async () => {
+  const handleInitialSubmit = async () => {
     if (formData.firstName && formData.lastName && formData.email && formData.phone && formData.address) {
       setIsSubmitting(true)
       try {
@@ -131,8 +137,32 @@ export default function RegistrationModal({ isOpen, onClose, courses }: Registra
           }
         }
         
-        await addRegistration({ id: crypto.randomUUID(), ...formData, documentUrls: fileUrls, createdAt: new Date().toISOString() })
-        setStep('success')
+        const newId = crypto.randomUUID()
+        setCurrentRegId(newId)
+        await addRegistration({ id: newId, ...formData, documentUrls: fileUrls, createdAt: new Date().toISOString() })
+        
+        // Notify admin about the new registration
+        fetch('/api/notify-registration', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            email: formData.email,
+            phone: formData.phone,
+            courseId: formData.courseId
+          }),
+        }).catch(err => console.error('Failed to notify admin:', err));
+        
+        const futureDate = new Date();
+        futureDate.setDate(futureDate.getDate() + 3);
+        const yyyy = futureDate.getFullYear();
+        const mm = String(futureDate.getMonth() + 1).padStart(2, '0');
+        const dd = String(futureDate.getDate()).padStart(2, '0');
+        const minDateStr = `${yyyy}-${mm}-${dd}`;
+        setFormData(fd => ({ ...fd, meetingDate: minDateStr }))
+        
+        setStep('meeting')
       } catch (error) {
         console.error("Upload error", error)
       } finally {
@@ -141,11 +171,52 @@ export default function RegistrationModal({ isOpen, onClose, courses }: Registra
     }
   }
 
+  const handleMeetingSubmit = async () => {
+    if (currentRegId && formData.meetingDate && formData.meetingTime) {
+      setIsSubmitting(true)
+      try {
+        await updateRegistration(currentRegId, { meetingDate: formData.meetingDate, meetingTime: formData.meetingTime })
+        
+        // Call our new API route to schedule in Google Calendar
+        const res = await fetch('/api/schedule-meeting', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            email: formData.email,
+            meetingDate: formData.meetingDate,
+            meetingTime: formData.meetingTime,
+          }),
+        });
+
+        if (!res.ok) {
+          console.error('Failed to schedule Google Calendar event:', await res.text());
+        }
+
+        setIsMeetingScheduled(true)
+        setStep('success')
+      } catch (error) {
+        console.error("Update error", error)
+      } finally {
+        setIsSubmitting(false)
+      }
+    }
+  }
+
+  const handleSkipMeeting = () => {
+    setStep('success')
+  }
+
   const handleClose = () => {
     setStep('course')
-    setFormData({ courseId: '', cityId: '', dayId: '', firstName: '', lastName: '', email: '', phone: '', address: '', citizenshipStatus: '', citizenshipDocsAttached: false, documentsAttached: false })
+    setFormData({ courseId: '', cityId: '', dayId: '', firstName: '', lastName: '', email: '', phone: '', address: '', citizenshipStatus: '', citizenshipDocsAttached: false, documentsAttached: false, meetingDate: '', meetingTime: '' })
     setCitizenshipFiles([])
     setQualificationFiles([])
+    setCurrentRegId(null)
+    setIsMeetingScheduled(false)
     onClose()
   }
 
@@ -184,9 +255,8 @@ export default function RegistrationModal({ isOpen, onClose, courses }: Registra
                 <X size={20} className="group-hover:rotate-90 transition-transform duration-300" />
               </button>
             </div>
-
             {/* Progress Stepper */}
-            {step !== 'success' && (
+            {step !== 'success' && step !== 'meeting' && (
               <div className="px-8 py-5 bg-slate-50 border-b border-slate-200 relative z-10">
                 <div className="flex justify-between relative">
                   <div className="absolute top-1/2 left-0 right-0 h-1 bg-slate-200 -translate-y-1/2 z-0 rounded-full overflow-hidden">
@@ -576,7 +646,7 @@ export default function RegistrationModal({ isOpen, onClose, courses }: Registra
 
                     <div className="flex gap-4 pt-6 mt-4 border-t border-slate-200">
                       <button onClick={() => setStep('qualification')} className="w-1/3 py-4 px-4 btn-secondary text-sm font-bold" disabled={isSubmitting}>Back</button>
-                      <button onClick={handleSubmit} disabled={!formData.firstName || !formData.lastName || !formData.email || !formData.phone || !formData.address || isSubmitting} className="w-2/3 btn-primary text-sm flex items-center justify-center gap-2 !py-4 font-bold disabled:opacity-30 disabled:cursor-not-allowed">
+                      <button onClick={handleInitialSubmit} disabled={!formData.firstName || !formData.lastName || !formData.email || !formData.phone || !formData.address || isSubmitting} className="w-2/3 btn-primary text-sm flex items-center justify-center gap-2 !py-4 font-bold disabled:opacity-30 disabled:cursor-not-allowed">
                         {isSubmitting ? (
                           <span className="flex items-center gap-2"><div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"/> Submitting...</span>
                         ) : (
@@ -587,18 +657,141 @@ export default function RegistrationModal({ isOpen, onClose, courses }: Registra
                   </motion.div>
                 )}
 
-                {step === 'success' && (
-                  <motion.div key="success" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center py-16 px-4 relative z-10">
-                    <motion.div initial={{ scale: 0, rotate: -180 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: 'spring', stiffness: 200, damping: 20, delay: 0.2 }} className="w-28 h-28 rounded-full bg-emerald-600 text-white flex items-center justify-center mx-auto mb-8 shadow-xl shadow-emerald-500/30">
-                      <CheckCircle2 size={56} className="text-white" />
+                {step === 'meeting' && (() => {
+                  const futureDate = new Date();
+                  futureDate.setDate(futureDate.getDate() + 3);
+                  const yyyy = futureDate.getFullYear();
+                  const mm = String(futureDate.getMonth() + 1).padStart(2, '0');
+                  const dd = String(futureDate.getDate()).padStart(2, '0');
+                  const minDateStr = `${yyyy}-${mm}-${dd}`;
+                  
+                  const meetingDates = storeMeetingDates || [];
+                  const globalSlots = storeMeetingSlots || [];
+
+                  // Only show dates that are at least 2 days from today
+                  const minAllowedDate = new Date();
+                  minAllowedDate.setDate(minAllowedDate.getDate() + 2);
+                  minAllowedDate.setHours(0, 0, 0, 0);
+                  const filteredMeetingDates = meetingDates.filter(md => new Date(md.date + 'T00:00:00') >= minAllowedDate);
+                  
+                  let baseSlots = globalSlots;
+                  if (formData.meetingDate && filteredMeetingDates.length > 0) {
+                      const selectedDateObj = filteredMeetingDates.find(md => md.date === formData.meetingDate);
+                      if (selectedDateObj) {
+                          baseSlots = selectedDateObj.slots;
+                      } else {
+                          baseSlots = [];
+                      }
+                  }
+                  
+                  // Filter out slots that are already booked for the selected date
+                  const availableSlots = baseSlots.filter(slot => {
+                    if (!formData.meetingDate) return true;
+                    return !registrations.some(reg => reg.meetingDate === formData.meetingDate && reg.meetingTime === slot);
+                  });
+
+                  return (
+                    <motion.div key="meeting" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="text-center py-6 px-2 relative z-10">
+                      <div className="w-20 h-20 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center mx-auto mb-6 shadow-inner">
+                        <Video size={36} />
+                      </div>
+                      <h3 className="text-3xl font-bold text-slate-900 mb-3 tracking-tight">Schedule Your Interview</h3>
+                      <p className="text-slate-600 text-[0.95rem] mb-8 max-w-sm mx-auto leading-relaxed">
+                        Your registration is successfully submitted! Next, select a date and time for your online admission meeting via Google Meet.
+                      </p>
+                      
+                      <div className="text-left space-y-5 bg-slate-50/50 p-5 rounded-2xl border border-slate-200 mb-8 max-w-md mx-auto">
+                        <div className="space-y-2">
+                          <label className="text-xs font-bold tracking-wider text-slate-700 uppercase ml-1">Select Date</label>
+                          <div className="relative">
+                            <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                            {meetingDates.length > 0 ? (
+                              <select 
+                                name="meetingDate" 
+                                value={formData.meetingDate} 
+                                onChange={handlePersonalChange} 
+                                onFocus={() => setFocused('md')} 
+                                onBlur={() => setFocused(null)} 
+                                className={`w-full pl-12 pr-4 py-3.5 bg-white border border-slate-300 rounded-xl text-slate-900 font-medium placeholder:text-slate-400 appearance-none ${focused==='md'?'border-indigo-600 ring-2 ring-indigo-500/20':''}`} 
+                              >
+                               <option value="" disabled>Select a date</option>
+                                {filteredMeetingDates.map(dateObj => (
+                                  <option key={dateObj.date} value={dateObj.date}>{new Date(dateObj.date + 'T00:00:00').toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</option>
+                                ))}
+                              </select>
+                            ) : (
+                              <input 
+                                type="date" 
+                                name="meetingDate" 
+                                min={minDateStr}
+                                value={formData.meetingDate} 
+                                onChange={handlePersonalChange} 
+                                onFocus={() => setFocused('md')} 
+                                onBlur={() => setFocused(null)} 
+                                className={`w-full pl-12 pr-4 py-3.5 bg-white border border-slate-300 rounded-xl text-slate-900 font-medium placeholder:text-slate-400 ${focused==='md'?'border-indigo-600 ring-2 ring-indigo-500/20':''}`} 
+                              />
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <label className="text-xs font-bold tracking-wider text-slate-700 uppercase ml-1">Select Time Slot <span className="text-indigo-500 lowercase normal-case">(UK Time)</span></label>
+                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                            {availableSlots.length > 0 ? (
+                              availableSlots.map(slot => (
+                                <button 
+                                  key={slot}
+                                  onClick={() => setFormData({ ...formData, meetingTime: slot })}
+                                  className={`py-3 px-2 rounded-xl text-sm font-bold border transition-all duration-200 ${formData.meetingTime === slot ? 'bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-500/20' : 'bg-white text-slate-700 border-slate-300 hover:border-indigo-400 hover:bg-indigo-50'}`}
+                                >
+                                  {slot}
+                                </button>
+                              ))
+                            ) : (
+                              <div className="col-span-full text-center py-4 bg-slate-50 border border-slate-200 border-dashed rounded-xl">
+                                <p className="text-sm text-slate-500 font-medium">No available slots for this date.</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto pt-2">
+                        <button onClick={handleSkipMeeting} className="w-full sm:w-1/3 py-4 px-4 btn-secondary text-sm font-bold" disabled={isSubmitting}>Skip for now</button>
+                        <button onClick={handleMeetingSubmit} disabled={!formData.meetingDate || !formData.meetingTime || isSubmitting} className="w-full sm:w-2/3 btn-primary text-sm flex items-center justify-center gap-2 !py-4 font-bold disabled:opacity-30 disabled:cursor-not-allowed">
+                          {isSubmitting ? (
+                            <span className="flex items-center gap-2"><div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"/> Scheduling...</span>
+                          ) : (
+                            <><CheckCircle2 size={18} /> Confirm Time</>
+                          )}
+                        </button>
+                      </div>
                     </motion.div>
-                    <h3 className="text-4xl font-bold text-slate-900 mb-4 tracking-tight">You&apos;re in!</h3>
-                    <p className="text-slate-600 text-lg mb-10 max-w-sm mx-auto leading-relaxed">
-                      Your seat is secured. We&apos;ve sent a confirmation email to <br/><span className="font-bold text-indigo-600">{formData.email}</span>
-                    </p>
-                    <button onClick={handleClose} className="w-full max-w-xs mx-auto btn-primary !py-4 text-base font-bold">Close & Return</button>
-                  </motion.div>
-                )}
+                  )
+                })()}
+
+                {step === 'success' && (() => {
+                  return (
+                    <motion.div key="success" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center py-16 px-4 relative z-10">
+                      <motion.div initial={{ scale: 0, rotate: -180 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: 'spring', stiffness: 200, damping: 20, delay: 0.2 }} className="w-28 h-28 rounded-full bg-emerald-600 text-white flex items-center justify-center mx-auto mb-8 shadow-xl shadow-emerald-500/30">
+                        <CheckCircle2 size={56} className="text-white" />
+                      </motion.div>
+                      <h3 className="text-4xl font-bold text-slate-900 mb-4 tracking-tight">You&apos;re in!</h3>
+                      <p className="text-slate-600 text-lg mb-8 max-w-sm mx-auto leading-relaxed">
+                        Your seat is secured. We&apos;ve sent a confirmation email to <br/><span className="font-bold text-indigo-600">{formData.email}</span>
+                      </p>
+                      
+                      {isMeetingScheduled && formData.meetingDate && formData.meetingTime && (
+                        <div className="bg-indigo-50 border border-indigo-100 rounded-2xl p-5 mb-10 max-w-sm mx-auto text-left">
+                          <h4 className="font-bold text-indigo-900 flex items-center gap-2 mb-2"><Video size={18} /> Meeting Scheduled</h4>
+                          <p className="text-sm text-indigo-800 mb-0">Your admission interview is set for <strong>{new Date(formData.meetingDate).toLocaleDateString()}</strong> at <strong>{formData.meetingTime}</strong>.</p>
+                        </div>
+                      )}
+
+                      <button onClick={handleClose} className="w-full max-w-xs mx-auto btn-primary !py-4 text-base font-bold">Close & Return</button>
+                    </motion.div>
+                  )
+                })()}
               </AnimatePresence>
             </div>
           </motion.div>

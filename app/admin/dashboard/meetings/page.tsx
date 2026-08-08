@@ -7,7 +7,7 @@ import { useStore } from '@/lib/store'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Trash2, Download, Eye, X, Users, User, Search, Mail, Phone, MapPin, Calendar, BookOpen, FileCheck, Map, Video, Clock, CheckCircle2, Plus, ExternalLink } from 'lucide-react'
 
-export default function RegistrationsManagement() {
+export default function MeetingsManagement() {
   const router = useRouter()
   const [isAuthed, setIsAuthed] = useState(false)
   const [selectedReg, setSelectedReg] = useState<string | null>(null)
@@ -50,18 +50,12 @@ export default function RegistrationsManagement() {
   }
 
   const handleExportCSV = () => {
-    const headers = ['First Name', 'Last Name', 'Email', 'Phone', 'Address', 'Course', 'Location', 'Schedule', 'Citizenship', 'Qualification', 'Meeting Date', 'Meeting Time', 'Date']
-    const rows = registrations.map(reg => [
+    const headers = ['First Name', 'Last Name', 'Email', 'Phone', 'Meeting Date', 'Meeting Time', 'Date Created']
+    const rows = generalMeetings.map(reg => [
       reg.firstName,
       reg.lastName,
       reg.email,
       reg.phone,
-      `"${reg.address}"`,
-      `"${getCourseName(reg.courseId)}"`,
-      `"${getCityName(reg.courseId, reg.cityId)}"`,
-      `"${getDayName(reg.courseId, reg.dayId)}"`,
-      `"${reg.citizenshipStatus || 'N/A'}"`,
-      reg.documentsAttached ? 'Yes' : 'No',
       reg.meetingDate ? `"${new Date(reg.meetingDate).toLocaleDateString()}"` : 'Not Scheduled',
       `"${reg.meetingTime || ''}"`,
       new Date(reg.createdAt).toLocaleDateString(),
@@ -124,11 +118,11 @@ export default function RegistrationsManagement() {
   }
 
   const filtered = registrations.filter(r =>
-    r.courseId !== '00000000-0000-0000-0000-000000000000' && 
-    `${r.firstName} ${r.lastName} ${r.email} ${r.phone} ${getCourseName(r.courseId)}`.toLowerCase().includes(search.toLowerCase())
+    r.courseId === '00000000-0000-0000-0000-000000000000' && 
+    `${r.firstName} ${r.lastName} ${r.email} ${r.phone}`.toLowerCase().includes(search.toLowerCase())
   )
 
-  const studentRegistrations = registrations.filter(r => r.courseId !== '00000000-0000-0000-0000-000000000000')
+  const generalMeetings = registrations.filter(r => r.courseId === '00000000-0000-0000-0000-000000000000')
 
   if (!isAuthed) return null
 
@@ -150,10 +144,10 @@ export default function RegistrationsManagement() {
                   <Users size={11} /> Registrations
                 </span>
               </div>
-              <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Student Registrations</h1>
-              <p className="text-slate-600 mt-1 text-sm">{studentRegistrations.length} total applications</p>
+              <h1 className="text-3xl font-bold text-slate-900 tracking-tight">General Meetings</h1>
+              <p className="text-slate-600 mt-1 text-sm">{generalMeetings.length} total meetings</p>
             </div>
-            {studentRegistrations.length > 0 && (
+            {generalMeetings.length > 0 && (
               <button
                 onClick={handleExportCSV}
                 className="flex items-center gap-2 btn-secondary !py-3 !px-6 text-sm font-bold shrink-0 shadow-sm"
@@ -189,11 +183,9 @@ export default function RegistrationsManagement() {
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="border-b border-slate-200 bg-slate-50/80 text-[0.7rem] font-bold text-slate-600 uppercase tracking-wider">
-                      <th className="py-4 px-6">Student</th>
+                      <th className="py-4 px-6">Name</th>
                       <th className="py-4 px-6">Contact</th>
-                      <th className="py-4 px-6">Course</th>
-                      <th className="py-4 px-6">Location & Schedule</th>
-                      <th className="py-4 px-6 text-center">Meeting</th>
+                      <th className="py-4 px-6 text-center">Meeting Date & Time</th>
                       <th className="py-4 px-6 text-center">Actions</th>
                     </tr>
                   </thead>
@@ -214,17 +206,6 @@ export default function RegistrationsManagement() {
                         <td className="py-4 px-6">
                           <p className="font-semibold text-slate-900">{reg.email}</p>
                           <p className="text-xs text-slate-500">{reg.phone}</p>
-                        </td>
-                        <td className="py-4 px-6">
-                          <span className="font-bold text-slate-900">{getCourseName(reg.courseId)}</span>
-                        </td>
-                        <td className="py-4 px-6">
-                          <p className="font-semibold text-slate-800 flex items-center gap-1 text-xs">
-                            <MapPin size={11} className="text-cyan-600 shrink-0" /> {getCityName(reg.courseId, reg.cityId)}
-                          </p>
-                          <p className="text-[0.7rem] text-slate-500 flex items-center gap-1 mt-0.5">
-                            <Calendar size={11} className="text-indigo-600 shrink-0" /> {getDayName(reg.courseId, reg.dayId)}
-                          </p>
                         </td>
                         <td className="py-4 px-6 text-center">
                           {reg.meetingDate ? (
@@ -308,11 +289,7 @@ export default function RegistrationsManagement() {
                 <div className="space-y-3">
                   {[
                     { icon: Mail, label: 'Email', value: selected.email, color: 'text-indigo-600' },
-                    { icon: Phone, label: 'Phone', value: selected.phone, color: 'text-cyan-600' },
-                    { icon: Map, label: 'Address', value: selected.address, color: 'text-pink-600' },
-                    { icon: BookOpen, label: 'Course', value: getCourseName(selected.courseId), color: 'text-amber-600' },
-                    { icon: MapPin, label: 'Location', value: getCityName(selected.courseId, selected.cityId), color: 'text-emerald-600' },
-                    { icon: Calendar, label: 'Schedule', value: getDayName(selected.courseId, selected.dayId), color: 'text-indigo-600' },
+                    { icon: Phone, label: 'Phone', value: selected.phone, color: 'text-cyan-600' }
                   ].map(field => {
                     const Icon = field.icon
                     return (
@@ -328,27 +305,7 @@ export default function RegistrationsManagement() {
                     )
                   })}
 
-                  <div className="flex items-center gap-3 p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
-                    <div className="w-8 h-8 rounded-xl bg-white border border-slate-200 flex items-center justify-center shrink-0 shadow-sm">
-                      <FileCheck size={15} className={selected.documentsAttached ? 'text-emerald-600' : 'text-slate-400'} />
-                    </div>
-                    <div>
-                      <p className="text-[0.65rem] font-bold uppercase tracking-wider text-slate-500">Qualifications</p>
-                      <p className={`text-sm font-bold mt-0.5 ${selected.documentsAttached ? 'text-emerald-700' : 'text-slate-500'}`}>
-                        {selected.documentsAttached ? 'Attached & Submitted' : 'Not submitted'}
-                      </p>
-                    </div>
-                  </div>
 
-                  <div className="flex items-center gap-3 p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
-                    <div className="w-8 h-8 rounded-xl bg-white border border-slate-200 flex items-center justify-center shrink-0 shadow-sm">
-                      <User size={15} className="text-indigo-600" />
-                    </div>
-                    <div>
-                      <p className="text-[0.65rem] font-bold uppercase tracking-wider text-slate-500">Citizenship / Residency Status</p>
-                      <p className="text-sm font-bold text-slate-900 mt-0.5">{selected.citizenshipStatus || 'British Citizens'}</p>
-                    </div>
-                  </div>
 
                   <div className={`flex items-center gap-3 p-3.5 rounded-2xl border ${selected.meetingDate ? 'bg-indigo-50 border-indigo-200' : 'bg-slate-50 border-slate-200'}`}>
                     <div className="w-8 h-8 rounded-xl bg-white border border-slate-200 flex items-center justify-center shrink-0 shadow-sm">
@@ -369,18 +326,7 @@ export default function RegistrationsManagement() {
                     </button>
                   </div>
 
-                  {selected.documentUrls && selected.documentUrls.length > 0 && (
-                    <div className="flex flex-col gap-2 p-3.5 rounded-2xl bg-indigo-50/60 border border-indigo-200">
-                      <p className="text-[0.65rem] font-bold uppercase tracking-wider text-indigo-800">Attached Document Files</p>
-                      <div className="flex flex-col gap-2 mt-1">
-                        {selected.documentUrls.map((url, idx) => (
-                          <a key={idx} href={url} target="_blank" rel="noreferrer" className="text-xs text-indigo-700 hover:text-indigo-900 font-bold underline break-all flex items-center gap-2">
-                            <FileCheck size={14} /> Document {idx + 1}
-                          </a>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+
                 </div>
 
                 <button
