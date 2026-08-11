@@ -122,13 +122,16 @@ export default function SettingsManagement() {
       }))
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setIsSaving(true)
-    setTimeout(() => {
-      setMeetingSlots(localSlots)
-      setMeetingDates(localDates)
+    try {
+      await setMeetingSlots(localSlots)
+      await setMeetingDates(localDates)
+    } catch (e) {
+      console.error('Failed to save settings', e)
+    } finally {
       setIsSaving(false)
-    }, 500)
+    }
   }
   
   // Format basic 10:00 to 10:00 AM
