@@ -40,20 +40,32 @@ export default function GalleryCarousel({ mainImage, groupImages }: GalleryCarou
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-            className="absolute inset-0"
+            className="absolute inset-0 bg-slate-950"
           >
+            {/* Blurred background layer for mixed aspect ratios */}
+            <Image
+              src={allImages[currentIndex]}
+              alt="Blurred background"
+              fill
+              className="object-cover opacity-50 blur-3xl scale-110"
+              priority
+              quality={10}
+              unoptimized
+            />
+            
+            {/* Main high-resolution image */}
             <Image
               src={allImages[currentIndex]}
               alt={`Gallery image ${currentIndex + 1}`}
               fill
-              className="object-contain"
+              className="object-contain drop-shadow-2xl"
               priority
               quality={100}
               unoptimized
             />
             {/* Vignette overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/10" />
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.15)_100%)]" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/10" />
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.3)_100%)] pointer-events-none" />
           </motion.div>
         </AnimatePresence>
 
