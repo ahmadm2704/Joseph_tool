@@ -419,8 +419,8 @@ export default function Home() {
               subtitle="Get a glimpse of our modern facilities and vibrant learning community."
             />
             <GalleryCarousel
-              mainImage="/gallery-classroom.png"
-              groupImages={['/hero-bg.png', '/about-scene.png', '/services-grid.png']}
+              mainImage="/gallery/image2.png"
+              groupImages={['/gallery/image1.jpg', '/gallery/image3.jpg', '/gallery/image4.png', '/gallery-classroom.png', '/about-scene.png']}
             />
           </div>
         </section>
