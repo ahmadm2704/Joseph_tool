@@ -669,8 +669,9 @@ export default function RegistrationModal({ isOpen, onClose, courses }: Registra
                   const meetingDates = storeMeetingDates || [];
                   const globalSlots = storeMeetingSlots || [];
 
-                  // Only show dates that are from today onwards
+                  // Only show dates that are at least 2 days from today (registration day)
                   const minAllowedDate = new Date();
+                  minAllowedDate.setDate(minAllowedDate.getDate() + 2);
                   minAllowedDate.setHours(0, 0, 0, 0);
                   const filteredMeetingDates = meetingDates.filter(md => new Date(md.date + 'T00:00:00') >= minAllowedDate);
                   

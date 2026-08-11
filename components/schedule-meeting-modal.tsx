@@ -34,6 +34,7 @@ export default function ScheduleMeetingModal({ isOpen, onClose }: ScheduleMeetin
   const globalSlots = meetingSlots || []
 
   const today = new Date();
+  today.setDate(today.getDate() + 2);
   today.setHours(0, 0, 0, 0);
   const filteredMeetingDates = meetingDates.filter(md => new Date(md.date + 'T00:00:00') >= today);
 
@@ -98,7 +99,7 @@ export default function ScheduleMeetingModal({ isOpen, onClose }: ScheduleMeetin
   }
 
   const futureDate = new Date()
-  futureDate.setDate(futureDate.getDate() + 3)
+  futureDate.setDate(futureDate.getDate() + 2)
   const minDateStr = `${futureDate.getFullYear()}-${String(futureDate.getMonth() + 1).padStart(2, '0')}-${String(futureDate.getDate()).padStart(2, '0')}`
 
   if (!isOpen) return null
