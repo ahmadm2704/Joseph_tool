@@ -1,0 +1,12 @@
+project: course-registration-website
+root: D:\Websites\course-registration-website
+beads:
+    enabled: true
+    prefix: cou
+roles:
+    - super
+    - pm
+    - eng1
+    - eng2
+    - qa1
+    - qa2
