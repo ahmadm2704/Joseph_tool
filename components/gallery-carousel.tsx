@@ -46,8 +46,10 @@ export default function GalleryCarousel({ mainImage, groupImages }: GalleryCarou
               src={allImages[currentIndex]}
               alt={`Gallery image ${currentIndex + 1}`}
               fill
-              className="object-cover"
+              className="object-contain"
               priority
+              quality={100}
+              unoptimized
             />
             {/* Vignette overlay */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/10" />
