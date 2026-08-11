@@ -5,7 +5,7 @@ import nodemailer from 'nodemailer';
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { firstName, lastName, email, meetingDate, meetingTime, isGeneralQuery } = body;
+    const { firstName, lastName, email, phone, meetingDate, meetingTime, isGeneralQuery } = body;
 
     if (!email || !meetingDate || !meetingTime) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -247,6 +247,7 @@ export async function POST(req: Request) {
               <div style="background: #f8faff; padding: 15px; border-radius: 8px; margin: 20px 0;">
                 <p style="margin: 5px 0;"><strong>Student:</strong> ${firstName} ${lastName}</p>
                 <p style="margin: 5px 0;"><strong>Email:</strong> ${email}</p>
+                <p style="margin: 5px 0;"><strong>Phone:</strong> ${phone || 'Not provided'}</p>
                 <p style="margin: 5px 0;"><strong>Date:</strong> ${formattedDate}</p>
                 <p><strong>When:</strong><br/>${new Date(meetingDate).toLocaleDateString()} &middot; ${meetingTime} (UK Time)</p>
                 <p style="margin: 5px 0;"><strong>Google Meet Link:</strong> <a href="${meetLink}">${meetLink}</a></p>

@@ -33,9 +33,13 @@ export default function ScheduleMeetingModal({ isOpen, onClose }: ScheduleMeetin
   const meetingDates = storeMeetingDates || []
   const globalSlots = meetingSlots || []
 
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const filteredMeetingDates = meetingDates.filter(md => new Date(md.date + 'T00:00:00') >= today);
+
   let baseSlots = globalSlots
-  if (formData.meetingDate && meetingDates.length > 0) {
-      const selectedDateObj = meetingDates.find(md => md.date === formData.meetingDate)
+  if (formData.meetingDate && filteredMeetingDates.length > 0) {
+      const selectedDateObj = filteredMeetingDates.find(md => md.date === formData.meetingDate)
       if (selectedDateObj) baseSlots = selectedDateObj.slots
       else baseSlots = []
   }
@@ -78,6 +82,7 @@ export default function ScheduleMeetingModal({ isOpen, onClose }: ScheduleMeetin
           firstName: formData.firstName,
           lastName: formData.lastName,
           email: formData.email,
+          phone: formData.phone,
           meetingDate: formData.meetingDate,
           meetingTime: formData.meetingTime,
           isGeneralQuery: true
@@ -148,11 +153,11 @@ export default function ScheduleMeetingModal({ isOpen, onClose }: ScheduleMeetin
                     <div className="space-y-4">
                       <div>
                         <label className="text-xs font-bold text-slate-700 uppercase ml-1 block mb-1.5">Select Date</label>
-                        {meetingDates.length > 0 ? (
+                        {filteredMeetingDates.length > 0 ? (
                           <select name="meetingDate" value={formData.meetingDate} onChange={handleChange as any} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:border-indigo-600">
                             <option value="" disabled>Select a date</option>
-                            {meetingDates.map(dateObj => (
-                              <option key={dateObj.date} value={dateObj.date}>{new Date(dateObj.date).toLocaleDateString()}</option>
+                            {filteredMeetingDates.map(dateObj => (
+                              <option key={dateObj.date} value={dateObj.date}>{new Date(dateObj.date + 'T00:00:00').toLocaleDateString()}</option>
                             ))}
                           </select>
                         ) : (

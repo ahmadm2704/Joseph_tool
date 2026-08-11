@@ -187,6 +187,7 @@ export default function RegistrationModal({ isOpen, onClose, courses }: Registra
             firstName: formData.firstName,
             lastName: formData.lastName,
             email: formData.email,
+            phone: formData.phone,
             meetingDate: formData.meetingDate,
             meetingTime: formData.meetingTime,
           }),
@@ -668,9 +669,8 @@ export default function RegistrationModal({ isOpen, onClose, courses }: Registra
                   const meetingDates = storeMeetingDates || [];
                   const globalSlots = storeMeetingSlots || [];
 
-                  // Only show dates that are at least 2 days from today
+                  // Only show dates that are from today onwards
                   const minAllowedDate = new Date();
-                  minAllowedDate.setDate(minAllowedDate.getDate() + 2);
                   minAllowedDate.setHours(0, 0, 0, 0);
                   const filteredMeetingDates = meetingDates.filter(md => new Date(md.date + 'T00:00:00') >= minAllowedDate);
                   

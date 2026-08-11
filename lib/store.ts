@@ -99,25 +99,25 @@ interface AppStore {
   meetingSlots: string[]
   meetingDates: MeetingDate[]
 
-  setMeetingSlots: (slots: string[]) => void
-  setMeetingDates: (dates: MeetingDate[]) => void
+  setMeetingSlots: (slots: string[]) => Promise<void>
+  setMeetingDates: (dates: MeetingDate[]) => Promise<void>
 
   addCourse: (course: Course) => Promise<void>
   removeCourse: (id: string) => Promise<void>
   updateCourse: (course: Course) => Promise<void>
   setCourses: (courses: Course[]) => void
 
-  addCity: (city: City) => void
-  removeCity: (id: string) => void
-  setCities: (cities: City[]) => void
+  addCity: (city: City) => Promise<void>
+  removeCity: (id: string) => Promise<void>
+  setCities: (cities: City[]) => Promise<void>
 
-  addDay: (day: Day) => void
-  removeDay: (id: string) => void
-  setDays: (days: Day[]) => void
+  addDay: (day: Day) => Promise<void>
+  removeDay: (id: string) => Promise<void>
+  setDays: (days: Day[]) => Promise<void>
 
-  addGalleryImage: (image: GalleryImage) => void
-  removeGalleryImage: (id: string) => void
-  setGalleryImages: (images: GalleryImage[]) => void
+  addGalleryImage: (image: GalleryImage) => Promise<void>
+  removeGalleryImage: (id: string) => Promise<void>
+  setGalleryImages: (images: GalleryImage[]) => Promise<void>
 
   addRegistration: (registration: StudentRegistration) => Promise<void>
   updateRegistration: (id: string, updates: Partial<StudentRegistration>) => Promise<void>
@@ -287,16 +287,61 @@ export const useStore = create<AppStore>()(
       meetingSlots: ['09:00 AM', '10:00 AM', '11:00 AM', '02:00 PM', '03:00 PM', '04:00 PM'],
       meetingDates: [], // By default, let's keep it empty, meaning the logic can fall back to generic dates if empty or we can force them to add some. We will handle this in UI.
 
-      setMeetingSlots: (slots) => set({ meetingSlots: slots }),
-      setMeetingDates: (dates) => set({ meetingDates: dates }),
+      setMeetingSlots: async (slots) => {
+        set({ meetingSlots: slots })
+        try {
+          await fetch('/api/settings/meeting', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ slots }) })
+        } catch (e) {
+          console.warn("API operation bypassed:", e)
+        }
+      },
+      setMeetingDates: async (dates) => {
+        set({ meetingDates: dates })
+        try {
+          await fetch('/api/settings/meeting', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ dates }) })
+        } catch (e) {
+          console.warn("API operation bypassed:", e)
+        }
+      },
 
-      addCity: (city) => set((state) => ({ cities: [...state.cities, city] })),
-      removeCity: (id) => set((state) => ({ cities: state.cities.filter((c) => c.id !== id) })),
-      setCities: (cities) => set({ cities }),
+      addCity: async (city) => {
+        set((state) => ({ cities: [...state.cities, city] }))
+        try { await fetch('/api/settings/global', { method: 'POST', body: JSON.stringify({ cities: get().cities }) }) } catch (e) { console.warn(e) }
+      },
+      removeCity: async (id) => {
+        set((state) => ({ cities: state.cities.filter((c) => c.id !== id) }))
+        try { await fetch('/api/settings/global', { method: 'POST', body: JSON.stringify({ cities: get().cities }) }) } catch (e) { console.warn(e) }
+      },
+      setCities: async (cities) => {
+        set({ cities })
+        try { await fetch('/api/settings/global', { method: 'POST', body: JSON.stringify({ cities }) }) } catch (e) { console.warn(e) }
+      },
 
-      addDay: (day) => set((state) => ({ days: [...state.days, day] })),
-      removeDay: (id) => set((state) => ({ days: state.days.filter((d) => d.id !== id) })),
-      setDays: (days) => set({ days }),
+      addDay: async (day) => {
+        set((state) => ({ days: [...state.days, day] }))
+        try { await fetch('/api/settings/global', { method: 'POST', body: JSON.stringify({ days: get().days }) }) } catch (e) { console.warn(e) }
+      },
+      removeDay: async (id) => {
+        set((state) => ({ days: state.days.filter((d) => d.id !== id) }))
+        try { await fetch('/api/settings/global', { method: 'POST', body: JSON.stringify({ days: get().days }) }) } catch (e) { console.warn(e) }
+      },
+      setDays: async (days) => {
+        set({ days })
+        try { await fetch('/api/settings/global', { method: 'POST', body: JSON.stringify({ days }) }) } catch (e) { console.warn(e) }
+      },
+
+      addGalleryImage: async (image) => {
+        set((state) => ({ galleryImages: [...state.galleryImages, image] }))
+        try { await fetch('/api/settings/global', { method: 'POST', body: JSON.stringify({ galleryImages: get().galleryImages }) }) } catch (e) { console.warn(e) }
+      },
+      removeGalleryImage: async (id) => {
+        set((state) => ({ galleryImages: state.galleryImages.filter((img) => img.id !== id) }))
+        try { await fetch('/api/settings/global', { method: 'POST', body: JSON.stringify({ galleryImages: get().galleryImages }) }) } catch (e) { console.warn(e) }
+      },
+      setGalleryImages: async (images) => {
+        set({ galleryImages: images })
+        try { await fetch('/api/settings/global', { method: 'POST', body: JSON.stringify({ galleryImages: images }) }) } catch (e) { console.warn(e) }
+      },
 
       addCourse: async (course) => {
         set((state) => ({ courses: [...state.courses, course] }))
@@ -386,9 +431,7 @@ export const useStore = create<AppStore>()(
 
       setCourses: (courses) => set({ courses }),
 
-      addGalleryImage: (image) => set((state) => ({ galleryImages: [...state.galleryImages, image] })),
-      removeGalleryImage: (id) => set((state) => ({ galleryImages: state.galleryImages.filter((img) => img.id !== id) })),
-      setGalleryImages: (images) => set({ galleryImages: images }),
+
 
       addRegistration: async (registration) => {
         set((state) => ({ registrations: [...state.registrations, registration] }))
@@ -564,6 +607,29 @@ export const useStore = create<AppStore>()(
               createdAt: m.created_at
             }))
             set({ contactMessages: mappedMsgs })
+          }
+
+          try {
+            const settingsRes = await fetch('/api/settings/meeting');
+            if (settingsRes.ok) {
+              const data = await settingsRes.json();
+              if (data.slots && data.slots.length > 0) set({ meetingSlots: data.slots });
+              if (data.dates) set({ meetingDates: data.dates });
+            }
+          } catch (err) {
+            console.warn("Failed to sync meeting settings", err);
+          }
+
+          try {
+            const globalRes = await fetch('/api/settings/global');
+            if (globalRes.ok) {
+              const data = await globalRes.json();
+              if (data.cities && data.cities.length > 0) set({ cities: data.cities });
+              if (data.days && data.days.length > 0) set({ days: data.days });
+              if (data.galleryImages && data.galleryImages.length > 0) set({ galleryImages: data.galleryImages });
+            }
+          } catch (err) {
+            console.warn("Failed to sync global settings", err);
           }
         } catch (error) {
           console.error("Error syncing with Supabase", error)
