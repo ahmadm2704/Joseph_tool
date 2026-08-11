@@ -19,16 +19,22 @@ export default function AdminLogin() {
     setError('')
     setIsLoading(true)
 
-    const validEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'admin@coursepro.com'
-    const validPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'admin123'
+    try {
+      const res = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      })
+      const data = await res.json()
 
-    await new Promise(r => setTimeout(r, 600))
-
-    if (email === validEmail && password === validPassword) {
-      localStorage.setItem('adminSession', JSON.stringify({ email, timestamp: Date.now() }))
-      router.push('/admin/dashboard')
-    } else {
-      setError('Invalid credentials. Please try again.')
+      if (res.ok && data.success) {
+        localStorage.setItem('adminSession', JSON.stringify({ email, timestamp: Date.now() }))
+        router.push('/admin/dashboard')
+      } else {
+        setError(data.error || 'Invalid credentials. Please try again.')
+      }
+    } catch {
+      setError('Network error. Please try again.')
     }
 
     setIsLoading(false)

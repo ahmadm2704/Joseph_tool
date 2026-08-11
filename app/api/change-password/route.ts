@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 import { createClient } from '@supabase/supabase-js';
+import bcrypt from 'bcryptjs';
 
 export async function POST(req: Request) {
   try {
@@ -15,8 +16,31 @@ export async function POST(req: Request) {
     const gmailUser = process.env.GMAIL_USER;
     const gmailAppPassword = process.env.GMAIL_APP_PASSWORD;
 
-    // Verify current password
-    if (currentPassword !== adminPassword) {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    // Verify current password — check DB first, fall back to env var
+    let currentPasswordValid = false;
+    if (supabaseUrl && supabaseKey) {
+      try {
+        const supabase = createClient(supabaseUrl, supabaseKey);
+        const { data } = await supabase.from('admin_settings').select('value').eq('key', 'admin_password').single();
+        if (data?.value) {
+          const isHash = data.value.startsWith('$2');
+          currentPasswordValid = isHash
+            ? await bcrypt.compare(currentPassword, data.value)
+            : currentPassword === data.value;
+        }
+      } catch (e) {
+        console.warn('[change-password] DB check failed, using env fallback');
+      }
+    }
+    // Fallback to env var if no DB record
+    if (!currentPasswordValid) {
+      currentPasswordValid = currentPassword === adminPassword;
+    }
+
+    if (!currentPasswordValid) {
       return NextResponse.json({ error: 'Current password is incorrect.' }, { status: 401 });
     }
 
@@ -24,14 +48,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'New password must be at least 6 characters.' }, { status: 400 });
     }
 
-    // Save new password to Supabase admin_settings table
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
     if (supabaseUrl && supabaseKey) {
       try {
         const supabase = createClient(supabaseUrl, supabaseKey);
-        await supabase.from('admin_settings').upsert({ key: 'admin_password', value: newPassword }, { onConflict: 'key' });
+        // Hash the new password before storing
+        const hashedPassword = await bcrypt.hash(newPassword, 12);
+        await supabase.from('admin_settings').upsert({ key: 'admin_password', value: hashedPassword }, { onConflict: 'key' });
       } catch (e) {
         console.warn('[change-password] Supabase update notice:', e);
       }
