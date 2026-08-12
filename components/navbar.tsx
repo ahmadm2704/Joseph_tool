@@ -53,7 +53,7 @@ export default function Navbar() {
                 alt="4StudentChoice Logo" 
                 width={300} 
                 height={80} 
-                className="h-20 w-auto object-contain mix-blend-multiply drop-shadow-sm"
+                className="h-20 w-auto object-contain drop-shadow-sm"
                 priority
               />
             </div>

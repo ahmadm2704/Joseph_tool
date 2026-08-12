@@ -37,7 +37,7 @@ export default function AdminSidebar({ onLogout }: AdminSidebarProps) {
             alt="4StudentChoice Logo" 
             width={200} 
             height={60} 
-            className="h-16 w-auto object-contain mix-blend-multiply drop-shadow-sm"
+            className="h-16 w-auto object-contain drop-shadow-sm"
             priority
           />
         </div>
