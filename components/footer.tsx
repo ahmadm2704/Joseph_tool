@@ -18,7 +18,7 @@ export default function Footer() {
           <div className="lg:col-span-4">
             <Link href="/" className="inline-flex items-center gap-3 group mb-6">
               <Image 
-                src="/logo.png" 
+                src="/logo-clear.png" 
                 alt="4StudentChoice Logo" 
                 width={300} 
                 height={80} 

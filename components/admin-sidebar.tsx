@@ -33,7 +33,7 @@ export default function AdminSidebar({ onLogout }: AdminSidebarProps) {
       <div className="px-6 pt-8 pb-6 border-b border-slate-100">
         <div className="flex items-center gap-3">
           <Image 
-            src="/logo.png" 
+            src="/logo-clear.png" 
             alt="4StudentChoice Logo" 
             width={200} 
             height={60} 

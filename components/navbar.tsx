@@ -49,7 +49,7 @@ export default function Navbar() {
           <Link href="/" className="flex items-center gap-3 group">
             <div className="relative flex items-center gap-2">
               <Image 
-                src="/logo.png" 
+                src="/logo-clear.png" 
                 alt="4StudentChoice Logo" 
                 width={300} 
                 height={80} 
