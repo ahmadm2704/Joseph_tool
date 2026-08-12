@@ -20,9 +20,9 @@ export default function Footer() {
               <Image 
                 src="/logo.png" 
                 alt="4StudentChoice Logo" 
-                width={200} 
-                height={60} 
-                className="h-14 w-auto object-contain"
+                width={300} 
+                height={80} 
+                className="h-20 w-auto object-contain mix-blend-multiply drop-shadow-sm"
                 priority
               />
             </Link>

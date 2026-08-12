@@ -51,9 +51,9 @@ export default function Navbar() {
               <Image 
                 src="/logo.png" 
                 alt="4StudentChoice Logo" 
-                width={200} 
-                height={50} 
-                className="h-12 w-auto object-contain"
+                width={300} 
+                height={80} 
+                className="h-20 w-auto object-contain mix-blend-multiply drop-shadow-sm"
                 priority
               />
             </div>
