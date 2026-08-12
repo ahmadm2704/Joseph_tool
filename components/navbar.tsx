@@ -49,11 +49,11 @@ export default function Navbar() {
           <Link href="/" className="flex items-center gap-3 group">
             <div className="relative flex items-center gap-2">
               <Image 
-                src="/logo.png" 
+                src="/logo-transparent-final.png" 
                 alt="4StudentChoice Logo" 
                 width={350} 
                 height={90} 
-                className="h-24 w-auto object-contain mix-blend-darken drop-shadow-sm"
+                className="h-24 w-auto object-contain drop-shadow-sm"
                 priority
               />
             </div>
