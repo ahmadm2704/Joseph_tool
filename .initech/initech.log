@@ -1,0 +1,30 @@
+time=2026-08-12T02:54:42.702+05:00 level=INFO msg="[tui] starting" version=1.31.0 pid=23276 agents=6 verbose=false
+time=2026-08-12T02:54:42.702+05:00 level=INFO msg="[pid] wrote PID file" pid=23276 path=D:\Websites\course-registration-website\.initech\initech.pid
+time=2026-08-12T02:54:42.713+05:00 level=INFO msg="[ipc] listening" path=D:\Websites\course-registration-website\.initech\initech-course-registration-website.port
+time=2026-08-12T02:54:42.742+05:00 level=INFO msg="[panes-mutation] create-pane" old=0 new=1 names=[super]
+time=2026-08-12T02:54:42.762+05:00 level=INFO msg="[panes-mutation] create-pane" old=1 new=2 names="[super pm]"
+time=2026-08-12T02:54:42.783+05:00 level=INFO msg="[panes-mutation] create-pane" old=2 new=3 names="[super pm eng1]"
+time=2026-08-12T02:54:42.807+05:00 level=INFO msg="[panes-mutation] create-pane" old=3 new=4 names="[super pm eng1 eng2]"
+time=2026-08-12T02:54:42.833+05:00 level=INFO msg="[panes-mutation] create-pane" old=4 new=5 names="[super pm eng1 eng2 qa1]"
+time=2026-08-12T02:54:42.859+05:00 level=INFO msg="[panes-mutation] create-pane" old=5 new=6 names="[super pm eng1 eng2 qa1 qa2]"
+time=2026-08-12T02:54:42.859+05:00 level=INFO msg="[applyLayout] layout applied" panes=6 w=83 h=12
+time=2026-08-12T02:54:42.859+05:00 level=INFO msg="[applyLayout] all resizes complete"
+time=2026-08-12T02:54:42.859+05:00 level=INFO msg="[main-loop] entering event loop" ipcCh_cap=32 panes=6
+time=2026-08-12T02:54:42.859+05:00 level=INFO msg="[runOnMain] queued op" pending=0 cap=32
+time=2026-08-12T02:54:42.859+05:00 level=INFO msg="[runOnMain] op sent, waiting for execution"
+time=2026-08-12T02:54:42.860+05:00 level=INFO msg="[applyLayout] layout applied" panes=6 w=83 h=12
+time=2026-08-12T02:54:42.860+05:00 level=INFO msg="[applyLayout] all resizes complete"
+time=2026-08-12T02:54:42.860+05:00 level=INFO msg="[render] enter" frame=1 plan_panes=6
+time=2026-08-12T02:54:42.863+05:00 level=INFO msg="[render] screen.Show done" frame=1
+time=2026-08-12T02:54:42.863+05:00 level=INFO msg="[main-loop] processing ipcCh op"
+time=2026-08-12T02:54:42.863+05:00 level=INFO msg="[main-loop] op.fn returned, closing done channel"
+time=2026-08-12T02:54:42.863+05:00 level=INFO msg="[main-loop] done channel closed, about to render"
+time=2026-08-12T02:54:42.863+05:00 level=INFO msg="[render] enter" frame=2 plan_panes=6
+time=2026-08-12T02:54:42.864+05:00 level=INFO msg="[runOnMain] op executed"
+time=2026-08-12T02:54:42.865+05:00 level=INFO msg="[render] screen.Show done" frame=2
+time=2026-08-12T02:54:42.895+05:00 level=INFO msg="[render] enter" frame=3 plan_panes=6
+time=2026-08-12T02:54:42.897+05:00 level=INFO msg="[render] screen.Show done" frame=3
+time=2026-08-12T02:54:42.938+05:00 level=INFO msg="[render] enter" frame=4 plan_panes=6
+time=2026-08-12T02:54:42.942+05:00 level=INFO msg="[render] screen.Show done" frame=4
+time=2026-08-12T02:54:42.958+05:00 level=INFO msg="[render] enter" frame=5 plan_panes=6
+time=2026-08-12T02:54:42.979+05:00 level=INFO msg="[render] screen.Show done" frame=5

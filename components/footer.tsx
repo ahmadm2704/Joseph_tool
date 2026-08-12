@@ -3,6 +3,8 @@
 import Link from 'next/link'
 import { Sparkles, Mail, Phone, MapPin, ArrowUpRight, Globe, MessageCircle, Users } from 'lucide-react'
 
+import Image from 'next/image'
+
 export default function Footer() {
   return (
     <footer className="relative pt-24 pb-12 overflow-hidden border-t border-slate-200 bg-[#f1f5f9] text-[#0f172a]">
@@ -15,15 +17,14 @@ export default function Footer() {
           {/* Brand */}
           <div className="lg:col-span-4">
             <Link href="/" className="inline-flex items-center gap-3 group mb-6">
-              <div className="relative">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 via-purple-600 to-cyan-500 flex items-center justify-center shadow-lg shadow-indigo-500/20 group-hover:rotate-12 transition-transform duration-500">
-                  <Sparkles className="text-white" size={18} />
-                </div>
-              </div>
-              <div className="flex flex-col">
-                <span className="font-bold text-xl text-slate-900 tracking-tight leading-tight group-hover:text-indigo-600 transition-colors">CoursePro</span>
-                <span className="text-[0.6rem] text-slate-500 font-medium tracking-[0.2em] uppercase">Academy</span>
-              </div>
+              <Image 
+                src="/logo.png" 
+                alt="4StudentChoice Logo" 
+                width={200} 
+                height={60} 
+                className="h-14 w-auto object-contain"
+                priority
+              />
             </Link>
             <p className="text-sm text-slate-600 leading-relaxed mb-8 pr-4">
               Transforming careers through world-class professional training programs since 2020. Elevating the standard of online education.

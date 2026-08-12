@@ -2,9 +2,10 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Menu, X, LayoutDashboard, BookOpen, Users, Image, LogOut, GraduationCap, ChevronRight, MessageSquare, Settings, Calendar } from 'lucide-react'
+import { Menu, X, LayoutDashboard, BookOpen, Users, ImageIcon, LogOut, GraduationCap, ChevronRight, MessageSquare, Settings, Calendar } from 'lucide-react'
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import Image from 'next/image'
 
 interface AdminSidebarProps {
   onLogout: () => void
@@ -22,7 +23,7 @@ export default function AdminSidebar({ onLogout }: AdminSidebarProps) {
     { href: '/admin/dashboard/registrations', label: 'Registrations', icon: Users, color: 'text-pink-600' },
     { href: '/admin/dashboard/meetings', label: 'General Meetings', icon: Calendar, color: 'text-violet-600' },
     { href: '/admin/dashboard/contact', label: 'Contact Messages', icon: MessageSquare, color: 'text-emerald-600' },
-    { href: '/admin/dashboard/gallery', label: 'Gallery', icon: Image, color: 'text-amber-600' },
+    { href: '/admin/dashboard/gallery', label: 'Gallery', icon: ImageIcon, color: 'text-amber-600' },
     { href: '/admin/dashboard/settings', label: 'Settings', icon: Settings, color: 'text-slate-600' },
   ]
 
@@ -31,13 +32,14 @@ export default function AdminSidebar({ onLogout }: AdminSidebarProps) {
       {/* Logo */}
       <div className="px-6 pt-8 pb-6 border-b border-slate-100">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center shadow-md shadow-indigo-500/20">
-            <GraduationCap size={20} className="text-white" />
-          </div>
-          <div>
-            <h1 className="text-lg font-bold text-slate-900 tracking-tight">CoursePro</h1>
-            <p className="text-[0.65rem] text-indigo-600 font-bold uppercase tracking-widest">Admin Panel</p>
-          </div>
+          <Image 
+            src="/logo.png" 
+            alt="4StudentChoice Logo" 
+            width={150} 
+            height={40} 
+            className="h-10 w-auto object-contain"
+            priority
+          />
         </div>
       </div>
 

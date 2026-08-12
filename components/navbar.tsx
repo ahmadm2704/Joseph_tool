@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import { Menu, X, Sparkles } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import Image from 'next/image'
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
@@ -46,21 +47,15 @@ export default function Navbar() {
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="relative">
-              <motion.div
-                whileHover={{ rotate: 180 }}
-                transition={{ duration: 0.6 }}
-                className="w-11 h-11 rounded-xl bg-gradient-to-br from-violet-600 via-purple-600 to-cyan-500 flex items-center justify-center shadow-lg shadow-purple-500/30"
-              >
-                <Sparkles className="text-white" size={20} />
-              </motion.div>
-              <div className="absolute -inset-2 rounded-2xl bg-gradient-to-br from-purple-600 to-cyan-500 opacity-0 group-hover:opacity-15 blur-xl transition-all duration-500" />
-            </div>
-            <div className="flex flex-col">
-              <span className="font-bold text-xl gradient-text tracking-tight leading-tight">
-                CoursePro
-              </span>
-              <span className="text-[0.6rem] text-gray-600 font-medium tracking-[0.2em] uppercase">Academy</span>
+            <div className="relative flex items-center gap-2">
+              <Image 
+                src="/logo.png" 
+                alt="4StudentChoice Logo" 
+                width={200} 
+                height={50} 
+                className="h-12 w-auto object-contain"
+                priority
+              />
             </div>
           </Link>
 
