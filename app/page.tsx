@@ -14,6 +14,7 @@ import SpotlightCursor from '@/components/spotlight-cursor'
 
 const ThreeCanvas = dynamic(() => import('@/components/three-canvas'), { ssr: false })
 const ParticleField = dynamic(() => import('@/components/particle-field'), { ssr: false })
+const AchievementsSection = dynamic(() => import('@/components/achievements-section'), { ssr: false })
 import ScheduleMeetingModal from '@/components/schedule-meeting-modal'
 import RegistrationModal from '@/components/registration-modal'
 import { useStore } from '@/lib/store'
@@ -75,8 +76,7 @@ function SectionHeader({ badge, badgeIcon: BadgeIcon, title, highlight, subtitle
   )
 }
 
-import dynamic from 'next/dynamic'
-const AchievementsSection = dynamic(() => import('@/components/achievements-section'), { ssr: false })
+
 
 export default function Home() {
   const [isRegistrationOpen, setIsRegistrationOpen] = useState(false)
