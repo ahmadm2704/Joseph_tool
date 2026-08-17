@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, X, ZoomIn } from 'lucide-react';
 import { Document, Page, pdfjs } from 'react-pdf';
 
-// Initialize PDF.js worker — only in browser context
 if (typeof window !== 'undefined') {
   pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 }
@@ -16,83 +15,100 @@ interface Certificate {
   subtitle: string;
 }
 
+/* Measures the live width of a container element */
 function useContainerWidth(ref: React.RefObject<HTMLDivElement | null>) {
-  const [width, setWidth] = useState(400);
+  const [width, setWidth] = useState(0);
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    const observer = new ResizeObserver(([entry]) => {
-      setWidth(entry.contentRect.width);
-    });
-    observer.observe(el);
+    const ro = new ResizeObserver(([entry]) => setWidth(entry.contentRect.width));
+    ro.observe(el);
     setWidth(el.getBoundingClientRect().width);
-    return () => observer.disconnect();
-  }, [ref]);
+    return () => ro.disconnect();
+  }, []);
   return width;
 }
 
+/* ─── Full-screen responsive modal ─── */
 function CertificateModal({ cert, onClose }: { cert: Certificate; onClose: () => void }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const containerWidth = useContainerWidth(containerRef);
 
-  // Responsive modal width: max 90vw, max 800px
+  /* Close on Escape key */
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [onClose]);
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6"
+      className="fixed inset-0 z-[200] flex items-center justify-center p-4 sm:p-8"
       onClick={onClose}
     >
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/75 backdrop-blur-md" />
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-md" />
 
-      {/* Modal */}
+      {/* Modal box */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.85, y: 24 }}
+        initial={{ opacity: 0, scale: 0.88, y: 30 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.85, y: 24 }}
-        transition={{ type: 'spring', stiffness: 320, damping: 28 }}
-        className="relative z-10 bg-white rounded-3xl shadow-2xl w-full max-w-3xl overflow-hidden"
+        exit={{ opacity: 0, scale: 0.88, y: 30 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 26 }}
         onClick={(e) => e.stopPropagation()}
+        className="relative z-10 w-full max-w-3xl bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col"
+        style={{ maxHeight: '90vh' }}
       >
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 z-20 w-9 h-9 flex items-center justify-center rounded-full bg-black/10 hover:bg-black/20 transition-colors"
-        >
-          <X size={18} className="text-slate-700" />
-        </button>
-
-        {/* PDF — fills modal width */}
-        <div ref={containerRef} className="w-full flex justify-center bg-slate-50 overflow-hidden">
-          <Document
-            file={cert.pdf}
-            loading={
-              <div className="h-64 flex items-center justify-center">
-                <div className="w-8 h-8 border-4 border-sky-500 border-t-transparent rounded-full animate-spin" />
-              </div>
-            }
+        {/* ── Sticky header with title + close button ── */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 shrink-0 bg-white">
+          <div>
+            <h3 className="text-lg font-bold text-slate-900">{cert.title}</h3>
+            <p className="text-sm text-slate-500">{cert.subtitle}</p>
+          </div>
+          <button
+            onClick={onClose}
+            aria-label="Close"
+            className="ml-4 shrink-0 w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 hover:bg-red-100 hover:text-red-600 text-slate-600 transition-colors duration-200"
           >
-            <Page
-              pageNumber={1}
-              width={containerWidth || 600}
-              renderTextLayer={false}
-              renderAnnotationLayer={false}
-            />
-          </Document>
+            <X size={20} />
+          </button>
         </div>
 
-        {/* Footer */}
-        <div className="px-8 py-5 border-t border-slate-100 bg-white">
-          <h3 className="text-xl font-bold text-slate-900">{cert.title}</h3>
-          <p className="text-sm text-slate-500 mt-1">{cert.subtitle}</p>
+        {/* ── Scrollable PDF area ── */}
+        <div
+          ref={containerRef}
+          className="overflow-y-auto flex justify-center bg-slate-50"
+          style={{ maxHeight: 'calc(90vh - 80px)' }}
+        >
+          {containerWidth > 0 && (
+            <Document
+              file={cert.pdf}
+              loading={
+                <div className="h-64 flex items-center justify-center">
+                  <div className="w-8 h-8 border-4 border-sky-500 border-t-transparent rounded-full animate-spin" />
+                </div>
+              }
+            >
+              <Page
+                pageNumber={1}
+                /* rotate=90 corrects the sideways orientation of the PDFs */
+                rotate={90}
+                width={containerWidth}
+                renderTextLayer={false}
+                renderAnnotationLayer={false}
+              />
+            </Document>
+          )}
         </div>
       </motion.div>
     </motion.div>
   );
 }
 
+/* ─── Individual card ─── */
 function CertificateCard({ cert, onClick, delay }: { cert: Certificate; onClick: () => void; delay: number }) {
   const cardRef = useRef<HTMLDivElement>(null);
   const cardWidth = useContainerWidth(cardRef);
@@ -114,30 +130,32 @@ function CertificateCard({ cert, onClick, delay }: { cert: Certificate; onClick:
         transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
         className="rounded-2xl overflow-hidden border border-slate-200 bg-white shadow-md hover:shadow-xl hover:shadow-sky-200/40 transition-shadow duration-500"
       >
-        {/* Landscape Certificate Preview — fills the card width naturally */}
+        {/* Certificate preview — rotated straight */}
         <div ref={cardRef} className="relative w-full overflow-hidden bg-slate-50">
-          <Document
-            file={cert.pdf}
-            loading={
-              <div className="h-48 flex items-center justify-center">
-                <div className="w-7 h-7 border-4 border-sky-400 border-t-transparent rounded-full animate-spin" />
-              </div>
-            }
-          >
-            <Page
-              pageNumber={1}
-              width={cardWidth || 340}
-              renderTextLayer={false}
-              renderAnnotationLayer={false}
-            />
-          </Document>
+          {cardWidth > 0 && (
+            <Document
+              file={cert.pdf}
+              loading={
+                <div className="h-48 flex items-center justify-center">
+                  <div className="w-7 h-7 border-4 border-sky-400 border-t-transparent rounded-full animate-spin" />
+                </div>
+              }
+            >
+              <Page
+                pageNumber={1}
+                rotate={90}
+                width={cardWidth}
+                renderTextLayer={false}
+                renderAnnotationLayer={false}
+              />
+            </Document>
+          )}
 
-          {/* Click Overlay */}
+          {/* Zoom overlay on hover */}
           <motion.div
-            initial={{ opacity: 0 }}
             animate={{ opacity: hovered ? 1 : 0 }}
             transition={{ duration: 0.2 }}
-            className="absolute inset-0 bg-sky-600/15 backdrop-blur-[1px] flex items-center justify-center"
+            className="absolute inset-0 bg-sky-600/20 backdrop-blur-[2px] flex items-center justify-center pointer-events-none"
           >
             <motion.div
               animate={{ scale: hovered ? 1 : 0.7, opacity: hovered ? 1 : 0 }}
@@ -149,7 +167,7 @@ function CertificateCard({ cert, onClick, delay }: { cert: Certificate; onClick:
           </motion.div>
         </div>
 
-        {/* Card Footer */}
+        {/* Card footer */}
         <div className="px-5 py-4 border-t border-slate-100">
           <h3 className="text-base font-bold text-slate-900 group-hover:text-sky-600 transition-colors">{cert.title}</h3>
           <p className="text-sm text-slate-500 mt-0.5">{cert.subtitle}</p>
@@ -159,6 +177,7 @@ function CertificateCard({ cert, onClick, delay }: { cert: Certificate; onClick:
   );
 }
 
+/* ─── Section ─── */
 export default function AchievementsSection() {
   const [selectedCert, setSelectedCert] = useState<Certificate | null>(null);
 
@@ -171,14 +190,12 @@ export default function AchievementsSection() {
   return (
     <>
       <section className="relative py-28 overflow-hidden bg-gradient-to-b from-slate-50 to-white">
-        {/* Background Decorations */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <div className="absolute -top-40 -right-40 w-96 h-96 bg-sky-400/10 rounded-full blur-3xl" />
           <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-cyan-400/10 rounded-full blur-3xl" />
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -194,12 +211,11 @@ export default function AchievementsSection() {
               Recognized <span className="gradient-text">Achievements</span>
             </h2>
             <p className="text-lg text-slate-500 max-w-2xl mx-auto leading-relaxed">
-              Our commitment to empowering the academic journey is validated by prestigious awards and industry recognition.{' '}
+              Our commitment to empowering the academic journey is validated by prestigious awards.{' '}
               <span className="text-sky-600 font-medium">Click any certificate to view it in full.</span>
             </p>
           </motion.div>
 
-          {/* Certificate Grid — landscape cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
             {certificates.map((cert, idx) => (
               <CertificateCard
@@ -213,7 +229,6 @@ export default function AchievementsSection() {
         </div>
       </section>
 
-      {/* Full-screen Responsive Modal */}
       <AnimatePresence>
         {selectedCert && (
           <CertificateModal cert={selectedCert} onClose={() => setSelectedCert(null)} />
