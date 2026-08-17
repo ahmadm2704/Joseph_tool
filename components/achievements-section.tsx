@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
-import { Award, Trophy, Star } from 'lucide-react';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Trophy, X, ZoomIn } from 'lucide-react';
 import { Document, Page, pdfjs } from 'react-pdf';
 
 // Initialize PDF.js worker — only in browser context
@@ -10,90 +10,140 @@ if (typeof window !== 'undefined') {
   pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 }
 
-interface CertificateCardProps {
-  pdfUrl: string;
+interface Certificate {
+  pdf: string;
   title: string;
   subtitle: string;
-  delay: number;
 }
 
-function Certificate3DCard({ pdfUrl, title, subtitle, delay }: CertificateCardProps) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [isHovered, setIsHovered] = useState(false);
-  
-  // 3D Tilt Effect
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
+interface CertificateModalProps {
+  cert: Certificate;
+  onClose: () => void;
+}
 
-  const mouseXSpring = useSpring(x, { stiffness: 150, damping: 15 });
-  const mouseYSpring = useSpring(y, { stiffness: 150, damping: 15 });
+function CertificateModal({ cert, onClose }: CertificateModalProps) {
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-50 flex items-center justify-center p-4"
+        onClick={onClose}
+      >
+        {/* Backdrop */}
+        <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
 
-  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["12.5deg", "-12.5deg"]);
-  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-12.5deg", "12.5deg"]);
+        {/* Modal Content */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.8, y: 20 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+          className="relative z-10 bg-white rounded-3xl shadow-2xl p-6 max-w-2xl w-full mx-auto"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Close Button */}
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 transition-colors z-20"
+          >
+            <X size={20} className="text-slate-600" />
+          </button>
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!ref.current) return;
-    const rect = ref.current.getBoundingClientRect();
-    const width = rect.width;
-    const height = rect.height;
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-    const xPct = mouseX / width - 0.5;
-    const yPct = mouseY / height - 0.5;
-    x.set(xPct);
-    y.set(yPct);
-  };
+          {/* PDF Viewer */}
+          <div className="flex flex-col items-center">
+            <div className="w-full flex justify-center overflow-hidden rounded-2xl border border-slate-100 shadow-inner bg-slate-50">
+              <Document
+                file={cert.pdf}
+                loading={
+                  <div className="h-96 flex items-center justify-center text-slate-400">
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="w-8 h-8 border-4 border-sky-500 border-t-transparent rounded-full animate-spin" />
+                      <span className="text-sm">Loading certificate...</span>
+                    </div>
+                  </div>
+                }
+              >
+                <Page
+                  pageNumber={1}
+                  width={Math.min(typeof window !== 'undefined' ? window.innerWidth - 80 : 560, 560)}
+                  renderTextLayer={false}
+                  renderAnnotationLayer={false}
+                />
+              </Document>
+            </div>
 
-  const handleMouseLeave = () => {
-    setIsHovered(false);
-    x.set(0);
-    y.set(0);
-  };
+            <div className="mt-6 text-center">
+              <h3 className="text-2xl font-bold text-slate-900 mb-1">{cert.title}</h3>
+              <p className="text-slate-500">{cert.subtitle}</p>
+            </div>
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
+function CertificateCard({ cert, onClick, delay }: { cert: Certificate; onClick: () => void; delay: number }) {
+  const [hovered, setHovered] = useState(false);
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 50 }}
+      initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-100px" }}
-      transition={{ duration: 0.8, delay, ease: [0.16, 1, 0.3, 1] }}
-      className="relative group perspective-container"
+      viewport={{ once: true, margin: '-80px' }}
+      transition={{ duration: 0.7, delay, ease: [0.16, 1, 0.3, 1] }}
+      className="group cursor-pointer"
+      onClick={onClick}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
     >
       <motion.div
-        ref={ref}
-        onMouseMove={handleMouseMove}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={handleMouseLeave}
-        style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
-        className="relative w-full aspect-[1/1.4] rounded-2xl glass-card overflow-hidden cursor-pointer"
+        animate={{ y: hovered ? -8 : 0 }}
+        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+        className="relative rounded-2xl overflow-hidden border border-slate-200 bg-white shadow-lg hover:shadow-2xl hover:shadow-sky-200/50 transition-shadow duration-500"
       >
-        {/* Glowing Background Blur */}
-        <div className="absolute inset-0 bg-gradient-to-br from-sky-500/20 to-cyan-500/20 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-        
-        {/* Certificate Rendering */}
-        <div className="absolute inset-0 p-4 flex flex-col items-center justify-center transform-gpu" style={{ transform: "translateZ(30px)" }}>
-          <div className="w-full h-full bg-white/5 rounded-xl border border-white/20 overflow-hidden shadow-2xl relative flex items-center justify-center">
-            <Document 
-              file={pdfUrl}
-              loading={<div className="animate-pulse text-sky-600/50 flex flex-col items-center"><Award size={32} className="mb-2" />Loading...</div>}
-              error={<div className="text-red-400">Failed to load certificate</div>}
+        {/* Certificate Preview */}
+        <div className="relative w-full flex items-center justify-center bg-slate-50 overflow-hidden" style={{ minHeight: 280 }}>
+          <Document
+            file={cert.pdf}
+            loading={
+              <div className="h-64 flex items-center justify-center text-slate-300">
+                <div className="w-8 h-8 border-4 border-sky-400 border-t-transparent rounded-full animate-spin" />
+              </div>
+            }
+          >
+            <Page
+              pageNumber={1}
+              width={320}
+              renderTextLayer={false}
+              renderAnnotationLayer={false}
+            />
+          </Document>
+
+          {/* Hover Overlay */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: hovered ? 1 : 0 }}
+            transition={{ duration: 0.25 }}
+            className="absolute inset-0 bg-sky-600/20 backdrop-blur-[2px] flex items-center justify-center"
+          >
+            <motion.div
+              initial={{ scale: 0.7, opacity: 0 }}
+              animate={{ scale: hovered ? 1 : 0.7, opacity: hovered ? 1 : 0 }}
+              transition={{ duration: 0.25, type: 'spring', stiffness: 300 }}
+              className="bg-white rounded-full p-4 shadow-xl"
             >
-              <Page 
-                pageNumber={1} 
-                width={320} 
-                renderTextLayer={false} 
-                renderAnnotationLayer={false}
-                className="transition-transform duration-700 ease-out group-hover:scale-105 shadow-md"
-              />
-            </Document>
-            
-            {/* Glossy Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/20 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 z-10 pointer-events-none" />
-          </div>
-          
-          <div className="mt-6 text-center" style={{ transform: "translateZ(50px)" }}>
-            <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-1 group-hover:text-sky-600 transition-colors">{title}</h3>
-            <p className="text-sm text-slate-500">{subtitle}</p>
-          </div>
+              <ZoomIn size={28} className="text-sky-600" />
+            </motion.div>
+          </motion.div>
+        </div>
+
+        {/* Card Footer */}
+        <div className="px-6 py-5 border-t border-slate-100">
+          <h3 className="text-lg font-bold text-slate-900 group-hover:text-sky-600 transition-colors">{cert.title}</h3>
+          <p className="text-sm text-slate-500 mt-1">{cert.subtitle}</p>
         </div>
       </motion.div>
     </motion.div>
@@ -101,53 +151,62 @@ function Certificate3DCard({ pdfUrl, title, subtitle, delay }: CertificateCardPr
 }
 
 export default function AchievementsSection() {
-  const certificates = [
+  const [selectedCert, setSelectedCert] = useState<Certificate | null>(null);
+
+  const certificates: Certificate[] = [
     { pdf: '/certificates/cert1.pdf', title: 'Best Recruiter Award', subtitle: 'Recognizing outstanding dedication' },
-    { pdf: '/certificates/cert2.pdf', title: 'Line Manager\'s Achiever', subtitle: 'Excellence in leadership' },
-    { pdf: '/certificates/cert3.pdf', title: 'Certificate of Appreciation', subtitle: 'Outstanding performance in recruitment' }
+    { pdf: '/certificates/cert2.pdf', title: "Line Manager's Achiever", subtitle: 'Excellence in leadership' },
+    { pdf: '/certificates/cert3.pdf', title: 'Certificate of Appreciation', subtitle: 'Outstanding performance in recruitment' },
   ];
 
   return (
-    <section className="relative py-32 overflow-hidden bg-slate-50">
-      {/* Abstract Background Elements */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-        <div className="absolute -top-1/4 -right-1/4 w-1/2 h-1/2 bg-cyan-400/10 rounded-full blur-[120px]" />
-        <div className="absolute -bottom-1/4 -left-1/4 w-1/2 h-1/2 bg-sky-600/10 rounded-full blur-[120px]" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full mesh-gradient opacity-30" />
-      </div>
-
-      <div className="container mx-auto px-6 relative z-10">
-        <motion.div 
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="text-center max-w-3xl mx-auto mb-20"
-        >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass bg-white/60 mb-6 border border-sky-200 shadow-sm">
-            <Trophy className="text-sky-600" size={16} />
-            <span className="text-sm font-bold text-sky-800 tracking-wider uppercase">Our Excellence</span>
-          </div>
-          <h2 className="text-4xl md:text-6xl font-extrabold text-slate-900 mb-6 tracking-tight">
-            Recognized <span className="gradient-text">Achievements</span>
-          </h2>
-          <p className="text-lg text-slate-600 leading-relaxed">
-            Our commitment to empowering the academic journey is validated by prestigious awards and industry recognition.
-          </p>
-        </motion.div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12 max-w-6xl mx-auto">
-          {certificates.map((cert, idx) => (
-            <Certificate3DCard 
-              key={idx}
-              pdfUrl={cert.pdf}
-              title={cert.title}
-              subtitle={cert.subtitle}
-              delay={idx * 0.2}
-            />
-          ))}
+    <>
+      <section className="relative py-28 overflow-hidden bg-gradient-to-b from-slate-50 to-white">
+        {/* Background Decorations */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div className="absolute -top-40 -right-40 w-96 h-96 bg-sky-400/10 rounded-full blur-3xl" />
+          <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-cyan-400/10 rounded-full blur-3xl" />
         </div>
-      </div>
-    </section>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7 }}
+            className="text-center mb-16"
+          >
+            <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-sky-50 border border-sky-200 mb-6 shadow-sm">
+              <Trophy size={16} className="text-sky-600" />
+              <span className="text-sm font-bold text-sky-700 tracking-wider uppercase">Our Excellence</span>
+            </div>
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-900 mb-5 tracking-tight">
+              Recognized <span className="gradient-text">Achievements</span>
+            </h2>
+            <p className="text-lg text-slate-500 max-w-2xl mx-auto leading-relaxed">
+              Our commitment to empowering the academic journey is validated by prestigious awards and industry recognition. Click any certificate to view it in full.
+            </p>
+          </motion.div>
+
+          {/* Certificate Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {certificates.map((cert, idx) => (
+              <CertificateCard
+                key={idx}
+                cert={cert}
+                onClick={() => setSelectedCert(cert)}
+                delay={idx * 0.15}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Modal */}
+      {selectedCert && (
+        <CertificateModal cert={selectedCert} onClose={() => setSelectedCert(null)} />
+      )}
+    </>
   );
 }
