@@ -75,7 +75,8 @@ function SectionHeader({ badge, badgeIcon: BadgeIcon, title, highlight, subtitle
   )
 }
 
-import AchievementsSection from '@/components/achievements-section'
+import dynamic from 'next/dynamic'
+const AchievementsSection = dynamic(() => import('@/components/achievements-section'), { ssr: false })
 
 export default function Home() {
   const [isRegistrationOpen, setIsRegistrationOpen] = useState(false)
