@@ -1,13 +1,8 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy, X, ZoomIn } from 'lucide-react';
-import { Document, Page, pdfjs } from 'react-pdf';
-
-if (typeof window !== 'undefined') {
-  pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
-}
+import { Trophy, X, ZoomIn, ExternalLink } from 'lucide-react';
 
 interface Certificate {
   pdf: string;
@@ -15,37 +10,9 @@ interface Certificate {
   subtitle: string;
 }
 
-/* Measures the live width of a container element with safe fallback */
-function useContainerWidth(ref: React.RefObject<HTMLDivElement | null>, defaultWidth = 360) {
-  const [width, setWidth] = useState(defaultWidth);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const ro = new ResizeObserver(([entry]) => {
-      if (entry && entry.contentRect.width > 0) {
-        setWidth(entry.contentRect.width);
-      }
-    });
-    ro.observe(el);
-    if (el.getBoundingClientRect().width > 0) {
-      setWidth(el.getBoundingClientRect().width);
-    }
-    return () => ro.disconnect();
-  }, [ref, defaultWidth]);
-  return width;
-}
-
-/* ─── Full-screen responsive modal ─── */
+/* ─── Full-screen responsive modal using native iframe ─── */
 function CertificateModal({ cert, onClose }: { cert: Certificate; onClose: () => void }) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const containerWidth = useContainerWidth(containerRef, 650);
-
-  /* Close on Escape key */
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  }, [onClose]);
+  const [loaded, setLoaded] = useState(false);
 
   return (
     <motion.div
@@ -55,10 +22,8 @@ function CertificateModal({ cert, onClose }: { cert: Certificate; onClose: () =>
       className="fixed inset-0 z-[200] flex items-center justify-center p-4 sm:p-8"
       onClick={onClose}
     >
-      {/* Backdrop */}
       <div className="absolute inset-0 bg-black/80 backdrop-blur-md" />
 
-      {/* Modal box */}
       <motion.div
         initial={{ opacity: 0, scale: 0.88, y: 30 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -68,62 +33,55 @@ function CertificateModal({ cert, onClose }: { cert: Certificate; onClose: () =>
         className="relative z-10 w-full max-w-3xl bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col"
         style={{ maxHeight: '90vh' }}
       >
-        {/* ── Sticky header with title + close button ── */}
+        {/* Sticky header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 shrink-0 bg-white">
           <div>
             <h3 className="text-lg font-bold text-slate-900">{cert.title}</h3>
             <p className="text-sm text-slate-500">{cert.subtitle}</p>
           </div>
-          <button
-            onClick={onClose}
-            aria-label="Close"
-            className="ml-4 shrink-0 w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 hover:bg-red-100 hover:text-red-600 text-slate-600 transition-colors duration-200"
-          >
-            <X size={20} />
-          </button>
+          <div className="flex items-center gap-2 ml-4 shrink-0">
+            <a
+              href={cert.pdf}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-9 h-9 flex items-center justify-center rounded-full bg-sky-50 hover:bg-sky-100 text-sky-600 transition-colors"
+              title="Open in new tab"
+            >
+              <ExternalLink size={16} />
+            </a>
+            <button
+              onClick={onClose}
+              aria-label="Close"
+              className="w-9 h-9 flex items-center justify-center rounded-full bg-slate-100 hover:bg-red-100 hover:text-red-600 text-slate-600 transition-colors"
+            >
+              <X size={18} />
+            </button>
+          </div>
         </div>
 
-        {/* ── Scrollable PDF area ── */}
-        <div
-          ref={containerRef}
-          className="overflow-y-auto flex justify-center bg-slate-50 min-h-[300px]"
-          style={{ maxHeight: 'calc(90vh - 80px)' }}
-        >
-          <Document
-            file={cert.pdf}
-            loading={
-              <div className="h-64 flex items-center justify-center">
-                <div className="w-8 h-8 border-4 border-sky-500 border-t-transparent rounded-full animate-spin" />
-              </div>
-            }
-            error={
-              <div className="h-64 flex flex-col items-center justify-center text-slate-400 gap-2 p-6 text-center">
-                <Trophy size={32} className="text-sky-500/50" />
-                <p className="text-sm font-semibold text-slate-600">{cert.title}</p>
-                <p className="text-xs text-slate-400">Awarded for excellence in student recruitment and leadership</p>
-              </div>
-            }
-          >
-            <Page
-              pageNumber={1}
-              /* rotate=90 corrects the sideways orientation of the PDFs */
-              rotate={90}
-              width={containerWidth || 600}
-              renderTextLayer={false}
-              renderAnnotationLayer={false}
-            />
-          </Document>
+        {/* PDF viewer via browser native iframe */}
+        <div className="flex-1 relative bg-slate-100" style={{ height: 'calc(90vh - 76px)', minHeight: '400px' }}>
+          {!loaded && (
+            <div className="absolute inset-0 flex items-center justify-center bg-slate-50 z-10">
+              <div className="w-8 h-8 border-4 border-sky-500 border-t-transparent rounded-full animate-spin" />
+            </div>
+          )}
+          <iframe
+            src={cert.pdf}
+            title={cert.title}
+            className="w-full h-full border-0"
+            onLoad={() => setLoaded(true)}
+          />
         </div>
       </motion.div>
     </motion.div>
   );
 }
 
-/* ─── Individual card ─── */
+/* ─── Individual card using iframe thumbnail ─── */
 function CertificateCard({ cert, onClick, delay }: { cert: Certificate; onClick: () => void; delay: number }) {
-  const cardRef = useRef<HTMLDivElement>(null);
-  const cardWidth = useContainerWidth(cardRef, 360);
   const [hovered, setHovered] = useState(false);
+  const [loaded, setLoaded] = useState(false);
 
   return (
     <motion.div
@@ -141,36 +99,27 @@ function CertificateCard({ cert, onClick, delay }: { cert: Certificate; onClick:
         transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
         className="rounded-2xl overflow-hidden border border-slate-200 bg-white shadow-md hover:shadow-xl hover:shadow-sky-200/40 transition-shadow duration-500"
       >
-        {/* Certificate preview — rotated straight */}
-        <div ref={cardRef} className="relative w-full overflow-hidden bg-slate-50 min-h-[220px] flex items-center justify-center">
-          <Document
-            file={cert.pdf}
-            loading={
-              <div className="h-48 flex items-center justify-center">
-                <div className="w-7 h-7 border-4 border-sky-400 border-t-transparent rounded-full animate-spin" />
-              </div>
-            }
-            error={
-              <div className="h-48 flex flex-col items-center justify-center text-slate-400 gap-1.5 p-4 text-center">
-                <Trophy size={26} className="text-sky-500/50" />
-                <p className="text-xs font-semibold text-slate-600">{cert.title}</p>
-              </div>
-            }
-          >
-            <Page
-              pageNumber={1}
-              rotate={90}
-              width={cardWidth || 340}
-              renderTextLayer={false}
-              renderAnnotationLayer={false}
-            />
-          </Document>
+        {/* Certificate preview via native iframe (pointer-events-none so click passes through) */}
+        <div className="relative w-full overflow-hidden bg-slate-50" style={{ height: '280px' }}>
+          {!loaded && (
+            <div className="absolute inset-0 flex items-center justify-center bg-slate-50 z-10">
+              <div className="w-6 h-6 border-4 border-sky-400 border-t-transparent rounded-full animate-spin" />
+            </div>
+          )}
+          <iframe
+            src={cert.pdf + '#view=Fit&toolbar=0&navpanes=0&scrollbar=0'}
+            title={cert.title}
+            className="w-full border-0 pointer-events-none select-none"
+            style={{ height: '280px' }}
+            onLoad={() => setLoaded(true)}
+            tabIndex={-1}
+          />
 
           {/* Zoom overlay on hover */}
           <motion.div
             animate={{ opacity: hovered ? 1 : 0 }}
             transition={{ duration: 0.2 }}
-            className="absolute inset-0 bg-sky-600/20 backdrop-blur-[2px] flex items-center justify-center pointer-events-none"
+            className="absolute inset-0 bg-sky-600/20 backdrop-blur-[2px] flex items-center justify-center"
           >
             <motion.div
               animate={{ scale: hovered ? 1 : 0.7, opacity: hovered ? 1 : 0 }}
