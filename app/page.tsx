@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { motion, useScroll, useTransform, useInView } from 'framer-motion'
-import { Sparkles, GraduationCap, Users, Award, Globe, ArrowRight, Code, Smartphone, BrainCircuit, Cloud, Shield, BarChart3, Star, Zap, Target, Mail, Quote, ChevronRight, Play, Calendar, BookOpen } from 'lucide-react'
+import { Sparkles, GraduationCap, Users, Award, Globe, ArrowRight, Code, Smartphone, BrainCircuit, Cloud, Shield, BarChart3, Star, Zap, Target, Mail, Quote, ChevronRight, Play, Calendar, BookOpen, Building, Clock, Layers, Filter } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import Navbar from '@/components/navbar'
@@ -114,13 +114,195 @@ export default function Home() {
     { value: 100, suffix: '%', label: 'UK Exclusive', icon: Globe },
   ]
 
+  const [selectedProvider, setSelectedProvider] = useState('All')
+
   const courseCards = [
-    { icon: Code, title: 'Web Development', price: '$499', color: 'from-blue-500 to-cyan-500', shadow: 'shadow-blue-500/20', students: '3.2K', rating: '4.9', tags: ['React', 'Next.js', 'Node'] },
-    { icon: Smartphone, title: 'Mobile App Dev', price: '$599', color: 'from-purple-500 to-pink-500', shadow: 'shadow-purple-500/20', students: '2.8K', rating: '4.8', tags: ['Flutter', 'React Native'] },
-    { icon: BrainCircuit, title: 'Data Science & AI', price: '$699', color: 'from-emerald-500 to-teal-500', shadow: 'shadow-emerald-500/20', students: '4.1K', rating: '4.9', tags: ['Python', 'TensorFlow'] },
-    { icon: Cloud, title: 'Cloud Computing', price: '$549', color: 'from-orange-500 to-amber-500', shadow: 'shadow-orange-500/20', students: '1.9K', rating: '4.7', tags: ['AWS', 'Docker'] },
-    { icon: Shield, title: 'Cybersecurity', price: '$649', color: 'from-red-500 to-rose-500', shadow: 'shadow-red-500/20', students: '2.3K', rating: '4.8', tags: ['Kali', 'Pentesting'] },
-    { icon: BarChart3, title: 'Business Analytics', price: '$449', color: 'from-indigo-500 to-purple-500', shadow: 'shadow-indigo-500/20', students: '1.7K', rating: '4.7', tags: ['SQL', 'Tableau'] },
+    {
+      id: 'sirm-1',
+      provider: 'SIRM',
+      campus: 'Leicester',
+      title: 'Business and Tourism with Foundation Year',
+      duration: '4 Years',
+      startDate: '21 September 2026',
+      icon: GraduationCap,
+      color: 'from-blue-600 to-cyan-500',
+      shadow: 'shadow-blue-500/20',
+      schedules: [
+        {
+          label: 'Option 1',
+          campus: 'Thursday, 9:30am - 4:30pm',
+          online: 'Tuesday & Wednesday evenings, 6:00pm - 9:00pm'
+        },
+        {
+          label: 'Option 2',
+          campus: 'Tuesday, 9:30am - 4:30pm',
+          online: 'Monday, 9:30am - 4:30pm'
+        }
+      ],
+      tags: ['Foundation Year', 'Tourism & Business', 'Leicester']
+    },
+    {
+      id: 'sirm-2',
+      provider: 'SIRM',
+      campus: 'Leicester',
+      title: 'HND Business',
+      duration: '2 Years',
+      startDate: '5 October 2026',
+      icon: BookOpen,
+      color: 'from-sky-500 to-blue-600',
+      shadow: 'shadow-sky-500/20',
+      schedules: [
+        {
+          label: 'Timetable',
+          campus: 'Thursday, 9:30am - 4:30pm',
+          online: 'Tuesday, 9:30am - 4:30pm'
+        }
+      ],
+      tags: ['HND Diploma', 'Business Administration', 'Leicester']
+    },
+    {
+      id: 'sirm-3',
+      provider: 'SIRM',
+      campus: 'Leicester',
+      title: 'Level 4 Data Analyst NCFE',
+      duration: '2 Years',
+      startDate: '1 September 2026',
+      icon: BarChart3,
+      color: 'from-cyan-500 to-teal-600',
+      shadow: 'shadow-cyan-500/20',
+      schedules: [
+        {
+          label: 'Timetable',
+          campus: 'Tuesday, 9:30am - 4:30pm',
+          online: 'Friday, 9:30am - 4:30pm'
+        }
+      ],
+      tags: ['NCFE Level 4', 'Data Analytics', 'Tech & AI']
+    },
+    {
+      id: 'sirm-4',
+      provider: 'SIRM',
+      campus: 'Leicester',
+      title: 'NCC Business',
+      duration: '1 Year',
+      startDate: '1 September 2026',
+      icon: Award,
+      color: 'from-indigo-500 to-sky-600',
+      shadow: 'shadow-indigo-500/20',
+      schedules: [
+        {
+          label: 'Timetable',
+          campus: 'Tuesday, 9:30am - 4:30pm',
+          online: 'Wednesday & Thursday evenings, 6:00pm - 9:00pm'
+        }
+      ],
+      tags: ['NCC Education', '1-Year Fast Track', 'Business']
+    },
+    {
+      id: 'cecos-1',
+      provider: 'CECOS',
+      campus: 'Leicester Campus',
+      title: 'Business Management - BSc BMF',
+      duration: '4 Years',
+      startDate: 'September 2026',
+      icon: GraduationCap,
+      color: 'from-blue-600 to-indigo-700',
+      shadow: 'shadow-blue-500/20',
+      schedules: [
+        {
+          label: 'Option 1',
+          campus: 'Monday & Tuesday, 10:00am - 5:00pm',
+          online: null
+        },
+        {
+          label: 'Option 2',
+          campus: 'Monday & Tuesday 6:00pm - 9:00pm + Friday 10:00am - 5:00pm',
+          online: null
+        }
+      ],
+      tags: ['BSc (Hons)', 'Business Management', 'Undergraduate']
+    },
+    {
+      id: 'cecos-2',
+      provider: 'CECOS',
+      campus: 'Leicester Campus',
+      title: 'Foundation Degree Business and Management',
+      duration: '2 Years',
+      startDate: 'September 2026',
+      icon: BookOpen,
+      color: 'from-teal-500 to-cyan-600',
+      shadow: 'shadow-teal-500/20',
+      schedules: [
+        {
+          label: 'Option 1',
+          campus: 'Thursday on campus, 10:00am - 5:00pm',
+          online: 'Friday online, 10:00am - 5:00pm'
+        },
+        {
+          label: 'Option 2',
+          campus: 'Monday & Tuesday, 6:00pm - 9:00pm',
+          online: 'Saturday online, 10:00am - 5:00pm'
+        }
+      ],
+      tags: ['Foundation Degree', 'Management', 'Blended Learning']
+    },
+    {
+      id: 'cecos-3',
+      provider: 'CECOS',
+      campus: 'Leicester Campus',
+      title: 'FdA Early Childhood Studies',
+      duration: '2 Years',
+      startDate: 'September 2026',
+      icon: Users,
+      color: 'from-rose-500 to-pink-600',
+      shadow: 'shadow-rose-500/20',
+      schedules: [
+        {
+          label: 'Timetable',
+          campus: 'Monday & Tuesday 6:00pm - 9:00pm + Saturday 10:00am - 5:00pm (Campus)',
+          online: null
+        }
+      ],
+      tags: ['FdA Degree', 'Early Childhood', 'Education']
+    },
+    {
+      id: 'cecos-4',
+      provider: 'CECOS',
+      campus: 'Leicester Campus',
+      title: 'FdSc Leadership Principles in Health and Social Care',
+      duration: '2 Years',
+      startDate: 'September 2026',
+      icon: Shield,
+      color: 'from-emerald-500 to-teal-600',
+      shadow: 'shadow-emerald-500/20',
+      schedules: [
+        {
+          label: 'Timetable',
+          campus: 'Thursday on campus',
+          online: 'Friday online, 10:00am - 5:00pm'
+        }
+      ],
+      tags: ['FdSc Degree', 'Health & Social Care', 'Leadership']
+    },
+    {
+      id: 'apex-1',
+      provider: 'Apex College',
+      campus: 'Nottingham & Leicester',
+      title: 'HND Business Management',
+      duration: '2 Years',
+      startDate: '2026 Intake',
+      icon: Target,
+      color: 'from-amber-500 to-orange-600',
+      shadow: 'shadow-amber-500/20',
+      schedules: [
+        {
+          label: 'Timetable',
+          campus: 'Flexible schedule across Nottingham & Leicester campuses',
+          online: 'Timetable confirmed upon enrollment'
+        }
+      ],
+      tags: ['HND Pearson', 'Nottingham & Leicester', 'Business']
+    },
   ]
 
   const testimonials = [
@@ -341,60 +523,135 @@ export default function Home() {
         <section className="py-28 px-4 sm:px-6 lg:px-8 relative particle-bg">
           <div className="relative z-10 max-w-7xl mx-auto">
             <SectionHeader
-              badge="Programs"
-              badgeIcon={Code}
+              badge="2026 Intake"
+              badgeIcon={BookOpen}
               title="World-Class"
               highlight="Courses"
-              subtitle="Choose from our curated selection of professional programs designed by industry leaders and taught by world-class mentors."
+              subtitle="Choose from our accredited programs across Leicester & Nottingham campuses with flexible campus, evening, and online schedules."
             />
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 perspective-container">
-              {courseCards.map((course, i) => {
-                const Icon = course.icon
+            {/* Provider Filter Tabs */}
+            <div className="flex flex-wrap items-center justify-center gap-2.5 mb-14">
+              {[
+                { id: 'All', label: 'All Courses' },
+                { id: 'SIRM', label: 'SIRM - Leicester' },
+                { id: 'CECOS', label: 'CECOS - Leicester' },
+                { id: 'Apex College', label: 'Apex College' },
+              ].map((p) => {
+                const count = p.id === 'All' ? courseCards.length : courseCards.filter(c => c.provider === p.id).length
+                const active = selectedProvider === p.id
                 return (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, y: 40 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.08, duration: 0.6 }}
-                    className="glass-card p-7 group cursor-pointer card-3d"
+                  <button
+                    key={p.id}
+                    onClick={() => setSelectedProvider(p.id)}
+                    className={`px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all duration-300 cursor-pointer ${
+                      active
+                        ? 'bg-gradient-to-r from-sky-600 to-blue-600 text-white shadow-lg shadow-sky-500/25 scale-105'
+                        : 'bg-white/80 hover:bg-white text-slate-600 border border-slate-200/90 hover:border-sky-300 hover:text-sky-600 shadow-2xs'
+                    }`}
                   >
-                    {/* Header */}
-                    <div className="flex items-start justify-between mb-6">
-                      <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${course.color} flex items-center justify-center shadow-xl ${course.shadow} group-hover:scale-110 group-hover:rotate-3 transition-all duration-500`}>
-                        <Icon size={24} className="text-white" />
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <Star size={13} className="text-amber-500 fill-amber-500" />
-                        <span className="text-amber-600 font-bold text-sm">{course.rating}</span>
-                      </div>
-                    </div>
-
-                    {/* Content */}
-                    <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-indigo-600 transition-colors duration-300">{course.title}</h3>
-                    <p className="text-sm text-slate-600 mb-5 leading-relaxed">Master the latest technologies and frameworks with real-world projects and expert mentorship.</p>
-
-                    {/* Tags */}
-                    <div className="flex flex-wrap gap-2 mb-6">
-                      {course.tags.map((tag) => (
-                        <span key={tag} className="tag-pill">{tag}</span>
-                      ))}
-                    </div>
-
-                    {/* Footer */}
-                    <div className="flex items-center justify-between pt-5 border-t border-slate-100">
-                      <div>
-                        <span className="text-3xl font-bold gradient-text">{course.price}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-xs text-slate-500">
-                        <Users size={12} />
-                        <span>{course.students} enrolled</span>
-                      </div>
-                    </div>
-                  </motion.div>
+                    {p.label} <span className={`ml-1.5 text-xs px-2 py-0.5 rounded-full ${active ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'}`}>{count}</span>
+                  </button>
                 )
               })}
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 perspective-container">
+              {courseCards
+                .filter((course) => selectedProvider === 'All' || course.provider === selectedProvider)
+                .map((course, i) => {
+                  const Icon = course.icon
+                  return (
+                    <motion.div
+                      key={course.id}
+                      initial={{ opacity: 0, y: 30 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: i * 0.05, duration: 0.5 }}
+                      className="glass-card p-6 sm:p-7 flex flex-col justify-between group hover:border-sky-500/30 transition-all duration-300 shadow-lg hover:shadow-2xl hover:shadow-sky-200/40 relative"
+                    >
+                      <div>
+                        {/* Header: Provider Badge & Duration */}
+                        <div className="flex items-center justify-between gap-2 mb-4">
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-sky-500/10 text-sky-700 border border-sky-500/20">
+                            <Building size={12} className="text-sky-600" />
+                            {course.provider} • {course.campus}
+                          </span>
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-700 border border-emerald-500/20">
+                            <Clock size={11} className="text-emerald-600" />
+                            {course.duration}
+                          </span>
+                        </div>
+
+                        {/* Title & Icon Header */}
+                        <div className="flex items-start gap-3.5 mb-3">
+                          <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${course.color} flex items-center justify-center shrink-0 shadow-md ${course.shadow} group-hover:scale-110 transition-transform duration-300`}>
+                            <Icon size={20} className="text-white" />
+                          </div>
+                          <h3 className="text-lg sm:text-xl font-bold text-slate-900 leading-snug group-hover:text-sky-600 transition-colors">
+                            {course.title}
+                          </h3>
+                        </div>
+
+                        {/* Start Date / Intake */}
+                        <div className="flex items-center gap-1.5 text-xs text-slate-500 mb-4 px-1">
+                          <Calendar size={13} className="text-sky-500" />
+                          <span>Intake / Start Date: <strong className="text-slate-800 font-semibold">{course.startDate}</strong></span>
+                        </div>
+
+                        {/* Schedule Details Box */}
+                        <div className="bg-slate-50/90 rounded-2xl p-3.5 border border-slate-100 mb-5 space-y-2">
+                          <div className="text-[11px] font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1.5 mb-1.5">
+                            <Layers size={12} className="text-sky-600" />
+                            Schedule & Timetable Options
+                          </div>
+                          {course.schedules.map((sch, sIdx) => (
+                            <div key={sIdx} className="text-xs bg-white p-2.5 rounded-xl border border-slate-100 shadow-2xs space-y-1">
+                              <div className="font-bold text-sky-700 text-[11px] uppercase tracking-wide flex items-center gap-1">
+                                <span className="w-1.5 h-1.5 rounded-full bg-sky-500" />
+                                {sch.label}
+                              </div>
+                              {sch.campus && (
+                                <div className="flex items-start gap-1.5 text-slate-600 pl-2.5">
+                                  <span className="font-semibold text-slate-700 shrink-0">Campus:</span>
+                                  <span className="leading-tight">{sch.campus}</span>
+                                </div>
+                              )}
+                              {sch.online && (
+                                <div className="flex items-start gap-1.5 text-slate-600 pl-2.5">
+                                  <span className="font-semibold text-slate-700 shrink-0">Online:</span>
+                                  <span className="leading-tight">{sch.online}</span>
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Tags */}
+                        <div className="flex flex-wrap gap-1.5 mb-6">
+                          {course.tags.map((tag) => (
+                            <span key={tag} className="tag-pill text-[11px]">{tag}</span>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Card Action Footer */}
+                      <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
+                        <span className="text-xs text-slate-500 font-semibold flex items-center gap-1">
+                          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                          2026 Intake Open
+                        </span>
+                        <button
+                          onClick={() => setIsRegistrationOpen(true)}
+                          className="btn-primary py-2 px-4 text-xs inline-flex items-center gap-1.5 font-bold shadow-md hover:scale-105 cursor-pointer"
+                        >
+                          Enroll Now
+                          <ArrowRight size={13} />
+                        </button>
+                      </div>
+                    </motion.div>
+                  )
+                })}
             </div>
 
             <motion.div
@@ -403,10 +660,13 @@ export default function Home() {
               viewport={{ once: true }}
               className="text-center mt-14"
             >
-              <Link href="/services" className="btn-secondary text-sm inline-flex items-center gap-2 group">
-                View All Programs
+              <button
+                onClick={() => setIsRegistrationOpen(true)}
+                className="btn-secondary text-sm inline-flex items-center gap-2 group cursor-pointer"
+              >
+                Register For Any Program
                 <ChevronRight size={15} className="group-hover:translate-x-1 transition-transform" />
-              </Link>
+              </button>
             </motion.div>
           </div>
         </section>
