@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { motion, useScroll, useTransform, useInView } from 'framer-motion'
-import { Sparkles, GraduationCap, Users, Award, Globe, ArrowRight, Code, Smartphone, BrainCircuit, Cloud, Shield, BarChart3, Star, Zap, Target, Mail, Quote, ChevronRight, Play, Calendar, BookOpen, Building, Clock, Layers, Filter } from 'lucide-react'
+import { Sparkles, GraduationCap, Users, Award, Globe, ArrowRight, Code, Smartphone, BrainCircuit, Cloud, Shield, BarChart3, Star, Zap, Target, Mail, Quote, ChevronRight, Play, Calendar, BookOpen, Building, Clock, Layers, Filter, MapPin } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import Navbar from '@/components/navbar'
@@ -17,6 +17,7 @@ const ParticleField = dynamic(() => import('@/components/particle-field'), { ssr
 const AchievementsSection = dynamic(() => import('@/components/achievements-section'), { ssr: false })
 import ScheduleMeetingModal from '@/components/schedule-meeting-modal'
 import RegistrationModal from '@/components/registration-modal'
+import CourseDirectoryModal from '@/components/course-directory-modal'
 import { useStore } from '@/lib/store'
 
 /* ─── Animated Counter ─── */
@@ -81,6 +82,7 @@ function SectionHeader({ badge, badgeIcon: BadgeIcon, title, highlight, subtitle
 export default function Home() {
   const [isRegistrationOpen, setIsRegistrationOpen] = useState(false)
   const [isScheduleOpen, setIsScheduleOpen] = useState(false)
+  const [isDirectoryOpen, setIsDirectoryOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
   const { courses } = useStore()
   const { scrollYProgress } = useScroll()
@@ -661,10 +663,11 @@ export default function Home() {
               className="text-center mt-14"
             >
               <button
-                onClick={() => setIsRegistrationOpen(true)}
-                className="btn-secondary text-sm inline-flex items-center gap-2 group cursor-pointer"
+                onClick={() => setIsDirectoryOpen(true)}
+                className="btn-secondary text-sm inline-flex items-center gap-2.5 group cursor-pointer shadow-sm hover:shadow-md py-3.5 px-7"
               >
-                Register For Any Program
+                <MapPin size={16} className="text-sky-600 group-hover:scale-110 transition-transform" />
+                View All Programs & Cities
                 <ChevronRight size={15} className="group-hover:translate-x-1 transition-transform" />
               </button>
             </motion.div>
@@ -839,6 +842,7 @@ export default function Home() {
       
       <ScheduleMeetingModal isOpen={isScheduleOpen} onClose={() => setIsScheduleOpen(false)} />
       <RegistrationModal isOpen={isRegistrationOpen} onClose={() => setIsRegistrationOpen(false)} courses={courses} />
+      <CourseDirectoryModal isOpen={isDirectoryOpen} onClose={() => setIsDirectoryOpen(false)} />
     </main>
   )
 }
