@@ -135,7 +135,7 @@ export default function Home() {
 
       <div className="relative z-10">
         <Navbar />
-        <AnimatedBanner message="🎓 Enroll now and start your learning journey! Limited seats available for Q3 2024." />
+        <AnimatedBanner message="🎓 Enroll now and start your learning journey! Limited seats available for Q3 2026." />
 
         {/* ════════════════════════════════════════
             HERO
@@ -157,7 +157,7 @@ export default function Home() {
                   className="inline-flex items-center gap-2 glass px-5 py-2.5 rounded-full mb-10"
                 >
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="text-xs font-bold text-indigo-600 tracking-widest uppercase">Now Enrolling — Class of 2024</span>
+                  <span className="text-xs font-bold text-indigo-600 tracking-widest uppercase">Now Enrolling — Class of 2026</span>
                 </motion.div>
 
                 <motion.h1

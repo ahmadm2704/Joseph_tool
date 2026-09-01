@@ -31,7 +31,7 @@ export default function About() {
     { year: '2021', title: 'First 1,000 Students', description: 'Reached our first major milestone of enrolled learners worldwide.', icon: Users, color: 'from-blue-500 to-cyan-600' },
     { year: '2022', title: 'Global Expansion', description: 'Expanded to 25+ countries with localized content and mentors.', icon: Globe, color: 'from-emerald-500 to-teal-600' },
     { year: '2023', title: 'AI-Powered Learning', description: 'Introduced personalized, AI-driven adaptive course paths.', icon: Target, color: 'from-amber-500 to-orange-600' },
-    { year: '2024', title: '15K+ Community', description: 'Built a thriving global community of ambitious tech professionals.', icon: GraduationCap, color: 'from-pink-500 to-rose-600' },
+    { year: '2026', title: '15K+ Community', description: 'Built a thriving global community of ambitious tech professionals.', icon: GraduationCap, color: 'from-pink-500 to-rose-600' },
   ]
 
   const values = [

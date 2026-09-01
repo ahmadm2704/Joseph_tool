@@ -11,6 +11,7 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://4studentchoice.com'),
   title: 'CoursePro | Premium Professional Training',
   description: 'Transform your career with world-class professional courses. Expert instructors, cutting-edge curriculum, and lifetime support.',
   keywords: 'professional courses, training, web development, data science, career growth, online education',
@@ -18,6 +19,7 @@ export const metadata: Metadata = {
     title: 'CoursePro | Premium Professional Training',
     description: 'Transform your career with world-class professional courses.',
     type: 'website',
+    url: 'https://4studentchoice.com',
   },
 }
 
