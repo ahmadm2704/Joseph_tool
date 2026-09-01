@@ -101,12 +101,12 @@ export default function Home() {
   if (!mounted) return null
 
   const features = [
-    { icon: GraduationCap, title: 'Expert Instructors', description: 'Learn from seasoned professionals with 10+ years of hands-on industry experience.', color: 'from-violet-600 to-purple-700', shadow: 'shadow-violet-500/25' },
-    { icon: Target, title: 'Flexible Schedule', description: 'Study at your own pace with schedules designed for busy professionals.', color: 'from-cyan-500 to-blue-600', shadow: 'shadow-cyan-500/25' },
-    { icon: Zap, title: 'Lifetime Access', description: 'Get unlimited mentorship, course updates, and career guidance — forever.', color: 'from-amber-500 to-orange-600', shadow: 'shadow-amber-500/25' },
-    { icon: Globe, title: 'Global Community', description: 'Connect with 15,000+ ambitious learners and professionals worldwide.', color: 'from-emerald-500 to-teal-600', shadow: 'shadow-emerald-500/25' },
-    { icon: Award, title: 'Certified Programs', description: 'Earn industry-recognized certifications that accelerate your career growth.', color: 'from-pink-500 to-rose-600', shadow: 'shadow-pink-500/25' },
-    { icon: Shield, title: 'Money-Back Guarantee', description: 'Not satisfied? Get a full refund within the first 30 days — no questions asked.', color: 'from-indigo-500 to-purple-600', shadow: 'shadow-indigo-500/25' },
+    { icon: Target, title: 'Expert Guidance', description: 'We help you navigate the complex world of higher education to find the perfect fit.', color: 'from-violet-600 to-purple-700', shadow: 'shadow-violet-500/25' },
+    { icon: GraduationCap, title: 'University Admissions', description: 'Assistance with applications, documentation, and securing your spot at top institutions.', color: 'from-cyan-500 to-blue-600', shadow: 'shadow-cyan-500/25' },
+    { icon: BookOpen, title: 'Course Selection', description: 'Personalized advice on which programs align best with your long-term career goals.', color: 'from-amber-500 to-orange-600', shadow: 'shadow-amber-500/25' },
+    { icon: Globe, title: 'Visa & Immigration', description: 'Comprehensive support with student visa applications and immigration requirements.', color: 'from-emerald-500 to-teal-600', shadow: 'shadow-emerald-500/25' },
+    { icon: Award, title: 'Career Counseling', description: 'Insights into post-graduation opportunities and pathways for professional success.', color: 'from-pink-500 to-rose-600', shadow: 'shadow-pink-500/25' },
+    { icon: Shield, title: 'Dedicated Support', description: 'Ongoing assistance and mentorship throughout your entire educational journey.', color: 'from-indigo-500 to-purple-600', shadow: 'shadow-indigo-500/25' },
   ]
 
   const stats = [
@@ -700,11 +700,11 @@ export default function Home() {
         <section className="py-28 px-4 sm:px-6 lg:px-8 relative aurora-bg">
           <div className="relative z-10 max-w-7xl mx-auto">
             <SectionHeader
-              badge="Why CoursePro"
+              badge="Our Expertise"
               badgeIcon={Sparkles}
               title="Why Students Choose"
               highlight="Us"
-              subtitle="We deliver an unparalleled learning experience that sets you apart in the industry."
+              subtitle="We guide you to the right courses and institutions for your academic success."
             />
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 perspective-container">
