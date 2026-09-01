@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { motion, useScroll, useTransform, useInView } from 'framer-motion'
-import { Sparkles, GraduationCap, Users, Award, Globe, ArrowRight, Code, Smartphone, BrainCircuit, Cloud, Shield, BarChart3, Star, Zap, Target, Mail, Quote, ChevronRight, Play, Calendar } from 'lucide-react'
+import { Sparkles, GraduationCap, Users, Award, Globe, ArrowRight, Code, Smartphone, BrainCircuit, Cloud, Shield, BarChart3, Star, Zap, Target, Mail, Quote, ChevronRight, Play, Calendar, BookOpen } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import Navbar from '@/components/navbar'
@@ -108,9 +108,10 @@ export default function Home() {
 
   const stats = [
     { value: 15000, suffix: '+', label: 'Students Enrolled', icon: Users },
+    { value: 6000, suffix: '+', label: 'Active Students', icon: Zap },
     { value: 98, suffix: '%', label: 'Success Rate', icon: Award },
-    { value: 250, suffix: '+', label: 'Expert Mentors', icon: GraduationCap },
-    { value: 50, suffix: '+', label: 'Countries', icon: Globe },
+    { value: 250, suffix: '+', label: 'Available Options', icon: BookOpen },
+    { value: 100, suffix: '%', label: 'UK Exclusive', icon: Globe },
   ]
 
   const courseCards = [
@@ -306,7 +307,7 @@ export default function Home() {
         <section className="relative py-24">
           <div className="section-divider mb-24" />
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 sm:gap-8">
               {stats.map((stat, i) => {
                 const Icon = stat.icon
                 return (

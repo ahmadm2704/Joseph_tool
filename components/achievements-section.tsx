@@ -211,8 +211,7 @@ export default function AchievementsSection() {
               Recognized <span className="gradient-text">Achievements</span>
             </h2>
             <p className="text-lg text-slate-500 max-w-2xl mx-auto leading-relaxed">
-              Our commitment to empowering the academic journey is validated by prestigious awards.{' '}
-              <span className="text-sky-600 font-medium">Click any certificate to view it in full.</span>
+              Our commitment to empowering the academic journey is validated by prestigious awards.
             </p>
           </motion.div>
 
