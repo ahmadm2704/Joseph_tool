@@ -166,11 +166,11 @@ export default function Home() {
                   transition={{ duration: 0.8, delay: 0.4 }}
                   className="text-5xl md:text-6xl lg:text-[4.5rem] font-bold leading-[1.05] mb-8 tracking-tight"
                 >
-                  <span className="text-slate-900">Master Your</span>
+                  <span className="text-slate-900">Start Your</span>
                   <br />
-                  <span className="gradient-text">Professional</span>
+                  <span className="gradient-text">Career</span>
                   <br />
-                  <span className="text-slate-900">Craft.</span>
+                  <span className="text-slate-900">Today.</span>
                 </motion.h1>
 
                 <motion.p
