@@ -104,7 +104,7 @@ export default function Home() {
     { icon: Target, title: 'Expert Guidance', description: 'We help you navigate the complex world of higher education to find the perfect fit.', color: 'from-violet-600 to-purple-700', shadow: 'shadow-violet-500/25' },
     { icon: GraduationCap, title: 'University Admissions', description: 'Assistance with applications, documentation, and securing your spot at top institutions.', color: 'from-cyan-500 to-blue-600', shadow: 'shadow-cyan-500/25' },
     { icon: BookOpen, title: 'Course Selection', description: 'Personalized advice on which programs align best with your long-term career goals.', color: 'from-amber-500 to-orange-600', shadow: 'shadow-amber-500/25' },
-    { icon: Globe, title: 'Visa & Immigration', description: 'Comprehensive support with student visa applications and immigration requirements.', color: 'from-emerald-500 to-teal-600', shadow: 'shadow-emerald-500/25' },
+    { icon: BarChart3, title: 'Student Finance Support', description: 'Guidance and assistance with student loans, funding options, and financial planning.', color: 'from-emerald-500 to-teal-600', shadow: 'shadow-emerald-500/25' },
     { icon: Award, title: 'Career Counseling', description: 'Insights into post-graduation opportunities and pathways for professional success.', color: 'from-pink-500 to-rose-600', shadow: 'shadow-pink-500/25' },
     { icon: Shield, title: 'Dedicated Support', description: 'Ongoing assistance and mentorship throughout your entire educational journey.', color: 'from-indigo-500 to-purple-600', shadow: 'shadow-indigo-500/25' },
   ]
