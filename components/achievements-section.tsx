@@ -15,24 +15,30 @@ interface Certificate {
   subtitle: string;
 }
 
-/* Measures the live width of a container element */
-function useContainerWidth(ref: React.RefObject<HTMLDivElement | null>) {
-  const [width, setWidth] = useState(0);
+/* Measures the live width of a container element with safe fallback */
+function useContainerWidth(ref: React.RefObject<HTMLDivElement | null>, defaultWidth = 360) {
+  const [width, setWidth] = useState(defaultWidth);
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    const ro = new ResizeObserver(([entry]) => setWidth(entry.contentRect.width));
+    const ro = new ResizeObserver(([entry]) => {
+      if (entry && entry.contentRect.width > 0) {
+        setWidth(entry.contentRect.width);
+      }
+    });
     ro.observe(el);
-    setWidth(el.getBoundingClientRect().width);
+    if (el.getBoundingClientRect().width > 0) {
+      setWidth(el.getBoundingClientRect().width);
+    }
     return () => ro.disconnect();
-  }, []);
+  }, [ref, defaultWidth]);
   return width;
 }
 
 /* ─── Full-screen responsive modal ─── */
 function CertificateModal({ cert, onClose }: { cert: Certificate; onClose: () => void }) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const containerWidth = useContainerWidth(containerRef);
+  const containerWidth = useContainerWidth(containerRef, 650);
 
   /* Close on Escape key */
   useEffect(() => {
@@ -80,28 +86,33 @@ function CertificateModal({ cert, onClose }: { cert: Certificate; onClose: () =>
         {/* ── Scrollable PDF area ── */}
         <div
           ref={containerRef}
-          className="overflow-y-auto flex justify-center bg-slate-50"
+          className="overflow-y-auto flex justify-center bg-slate-50 min-h-[300px]"
           style={{ maxHeight: 'calc(90vh - 80px)' }}
         >
-          {containerWidth > 0 && (
-            <Document
-              file={cert.pdf}
-              loading={
-                <div className="h-64 flex items-center justify-center">
-                  <div className="w-8 h-8 border-4 border-sky-500 border-t-transparent rounded-full animate-spin" />
-                </div>
-              }
-            >
-              <Page
-                pageNumber={1}
-                /* rotate=90 corrects the sideways orientation of the PDFs */
-                rotate={90}
-                width={containerWidth}
-                renderTextLayer={false}
-                renderAnnotationLayer={false}
-              />
-            </Document>
-          )}
+          <Document
+            file={cert.pdf}
+            loading={
+              <div className="h-64 flex items-center justify-center">
+                <div className="w-8 h-8 border-4 border-sky-500 border-t-transparent rounded-full animate-spin" />
+              </div>
+            }
+            error={
+              <div className="h-64 flex flex-col items-center justify-center text-slate-400 gap-2 p-6 text-center">
+                <Trophy size={32} className="text-sky-500/50" />
+                <p className="text-sm font-semibold text-slate-600">{cert.title}</p>
+                <p className="text-xs text-slate-400">Awarded for excellence in student recruitment and leadership</p>
+              </div>
+            }
+          >
+            <Page
+              pageNumber={1}
+              /* rotate=90 corrects the sideways orientation of the PDFs */
+              rotate={90}
+              width={containerWidth || 600}
+              renderTextLayer={false}
+              renderAnnotationLayer={false}
+            />
+          </Document>
         </div>
       </motion.div>
     </motion.div>
@@ -111,7 +122,7 @@ function CertificateModal({ cert, onClose }: { cert: Certificate; onClose: () =>
 /* ─── Individual card ─── */
 function CertificateCard({ cert, onClick, delay }: { cert: Certificate; onClick: () => void; delay: number }) {
   const cardRef = useRef<HTMLDivElement>(null);
-  const cardWidth = useContainerWidth(cardRef);
+  const cardWidth = useContainerWidth(cardRef, 360);
   const [hovered, setHovered] = useState(false);
 
   return (
@@ -131,25 +142,29 @@ function CertificateCard({ cert, onClick, delay }: { cert: Certificate; onClick:
         className="rounded-2xl overflow-hidden border border-slate-200 bg-white shadow-md hover:shadow-xl hover:shadow-sky-200/40 transition-shadow duration-500"
       >
         {/* Certificate preview — rotated straight */}
-        <div ref={cardRef} className="relative w-full overflow-hidden bg-slate-50">
-          {cardWidth > 0 && (
-            <Document
-              file={cert.pdf}
-              loading={
-                <div className="h-48 flex items-center justify-center">
-                  <div className="w-7 h-7 border-4 border-sky-400 border-t-transparent rounded-full animate-spin" />
-                </div>
-              }
-            >
-              <Page
-                pageNumber={1}
-                rotate={90}
-                width={cardWidth}
-                renderTextLayer={false}
-                renderAnnotationLayer={false}
-              />
-            </Document>
-          )}
+        <div ref={cardRef} className="relative w-full overflow-hidden bg-slate-50 min-h-[220px] flex items-center justify-center">
+          <Document
+            file={cert.pdf}
+            loading={
+              <div className="h-48 flex items-center justify-center">
+                <div className="w-7 h-7 border-4 border-sky-400 border-t-transparent rounded-full animate-spin" />
+              </div>
+            }
+            error={
+              <div className="h-48 flex flex-col items-center justify-center text-slate-400 gap-1.5 p-4 text-center">
+                <Trophy size={26} className="text-sky-500/50" />
+                <p className="text-xs font-semibold text-slate-600">{cert.title}</p>
+              </div>
+            }
+          >
+            <Page
+              pageNumber={1}
+              rotate={90}
+              width={cardWidth || 340}
+              renderTextLayer={false}
+              renderAnnotationLayer={false}
+            />
+          </Document>
 
           {/* Zoom overlay on hover */}
           <motion.div
