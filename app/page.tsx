@@ -84,6 +84,7 @@ export default function Home() {
   const [isScheduleOpen, setIsScheduleOpen] = useState(false)
   const [isDirectoryOpen, setIsDirectoryOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [selectedProvider, setSelectedProvider] = useState('All')
   const { courses } = useStore()
   const { scrollYProgress } = useScroll()
   const heroY = useTransform(scrollYProgress, [0, 0.4], [0, -120])
@@ -116,7 +117,6 @@ export default function Home() {
     { value: 100, suffix: '%', label: 'UK Exclusive', icon: Globe },
   ]
 
-  const [selectedProvider, setSelectedProvider] = useState('All')
 
   const courseCards = [
     {
